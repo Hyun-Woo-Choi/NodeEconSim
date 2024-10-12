@@ -14,6 +14,8 @@ CREATE TABLE `users` (
 -- game room information
 CREATE TABLE `game_info` (
     `room_id` int NOT NULL AUTO_INCREMENT,
+    `room_submit` int NOT NULL DEFAULT 0,
+    `province_id` int NOT NULL DEFAULT 0, 
     `game_type` int NOT NULL,
     `user_cnt` int DEFAULT 0,
     `room_status` int DEFAULT 0,
@@ -24,67 +26,42 @@ CREATE TABLE `game_info` (
 CREATE TABLE `game_parameter` (
     `room_id` int NOT NULL,
     `init_w` float NOT NULL,
-    `contri_var` float NOT NULL,
-    `beef_w` float NOT NULL,
-    `chicken_w` float NOT NULL,
-    `beef_cost_var` float NOT NULL,
-    `beef_cost_b` float NOT NULL,
-    `beef_cost_c` float NOT NULL,
-    `chicken_cost_var` float NOT NULL,
-    `chicken_cost_b` float NOT NULL,
-    `chicken_cost_c` float NOT NULL,
+    `adjusted_w` float NOT NULL,
+    `price_var` float NOT NULL, 
     `init_budget` float NOT NULL,
-    `loan` float NOT NULL,
-    `change_var` float NOT NULL,
-    `change_weight` float NOT NULL,
+    `disaster_probability` float NOT NULL,
+    `isdisasteroccured` int NOT NULL DEFAULT 0,
+    `first_disaster` int NOT NULL DEFAULT 0,
+    `second_disaster` int NOT NULL DEFAULT 0,
+    `third_disaster` int NOT NULL DEFAULT 0,
+    `forth_disaster` int NOT NULL DEFAULT 0,
+    `fifth_disaster` int NOT NULL DEFAULT 0,
+    `total_energy` int NOT NULL DEFAULT 0,
+    `disaster_number` int NOT NULL DEFAULT 0,
+    `province_id` int NOT NULL DEFAULT 0,
     PRIMARY KEY (`room_id`)
 );
 
--- parameter for game type 1
-CREATE TABLE `parameter` (
+-- parameter for game type 
+CREATE TABLE `disaster_parameter` (
     `init_w` float NOT NULL,
-    `contri_var` float NOT NULL,
-    `beef_w` float NOT NULL,
-    `chicken_w` float NOT NULL,
-    `beef_cost_var` float NOT NULL,
-    `beef_cost_b` float NOT NULL,
-    `beef_cost_c` float NOT NULL,
-    `chicken_cost_var` float NOT NULL,
-    `chicken_cost_b` float NOT NULL,
-    `chicken_cost_c` float NOT NULL,
+    `adjusted_w` float NOT NULL,
+    `price_var` float NOT NULL, 
     `init_budget` float NOT NULL,
-    `loan` float NOT NULL
+    `disaster_probability` float NOT NULL,
+    `isdisasteroccured` int NOT NULL DEFAULT 0,
+    `first_disaster` int NOT NULL DEFAULT 0,
+    `second_disaster` int NOT NULL DEFAULT 0,
+    `third_disaster` int NOT NULL DEFAULT 0,
+    `forth_disaster` int NOT NULL DEFAULT 0,
+    `fifth_disaster` int NOT NULL DEFAULT 0,
+    `total_energy` int NOT NULL DEFAULT 0,
+    `disaster_number` int NOT NULL DEFAULT 0
 );
 
--- default parameter of game type 1
-INSERT INTO parameter (init_w, contri_var, beef_w, chicken_w, beef_cost_var, beef_cost_b, beef_cost_c, 
-                        chicken_cost_var, chicken_cost_b, chicken_cost_c, init_budget, loan)
-            VALUES (40, 0.002, 4, 1, 460, 6, 0, 
-                    340, 0, 4, 10000, 5000);
-
--- parameter for game type 2
-CREATE TABLE `parameter2` (
-    `init_w` float NOT NULL,
-    `contri_var` float NOT NULL,
-    `beef_w` float NOT NULL,
-    `chicken_w` float NOT NULL,
-    `beef_cost_var` float NOT NULL,
-    `beef_cost_b` float NOT NULL,
-    `beef_cost_c` float NOT NULL,
-    `chicken_cost_var` float NOT NULL,
-    `chicken_cost_b` float NOT NULL,
-    `chicken_cost_c` float NOT NULL,
-    `init_budget` float NOT NULL,
-    `loan` float NOT NULL,
-    `change_var` float NOT NULL,
-    `change_weight` float NOT NULL
-);
-
--- default parameter of game type 2
-INSERT INTO parameter2 (init_w, contri_var, beef_w, chicken_w, beef_cost_var, beef_cost_b, beef_cost_c, 
-                        chicken_cost_var, chicken_cost_b, chicken_cost_c, init_budget, loan, change_var, change_weight)
-            VALUES (40, 20000, 4, 1, 460, 6, 0, 
-                    340, 0, 4, 10000, 5000, 971, 0.77);
+-- default parameter of game
+INSERT INTO disaster_parameter (init_w, adjusted_w, price_var, init_budget, disaster_probability, isdisasteroccured, first_disaster, second_disaster, third_disaster, forth_disaster, fifth_disaster, total_energy, disaster_number)
+            VALUES (10, 10, 40, 5000, 20, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- all game record
 CREATE TABLE `game_record` (
@@ -95,11 +72,22 @@ CREATE TABLE `game_record` (
     `input_one` float,
     `input_two` float,
     `total_one` float DEFAULT 0,
-    `total_two` float DEFAULT 0,
+    `province_id` float DEFAULT 0,
     `price_one` float,
-    `price_two` float,
+    `contribution_profit` float DEFAULT 0,
     `profit` float DEFAULT 0,
     `budget` float DEFAULT 0,
     `psum` float DEFAULT 0,
+    `disaster_probability` int DEFAULT 0,
+    `isdisasteroccured` int DEFAULT 0,
     PRIMARY KEY (`round`, `id`, `room_id`)
+);
+
+-- total_energy_record
+CREATE TABLE `total_energy_record` (
+    `province_id` int NOT NULL,
+    `round` int NOT NULL,
+    `room_id` int NOT NULL,
+    `total_energy` int NOT NULL,
+    PRIMARY KEY (`round`, `room_id`)
 );

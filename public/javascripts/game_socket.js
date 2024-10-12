@@ -28,17 +28,18 @@ socket.on('other_user_submit', function(msg) {
         $('#other_user_status_1').addClass('badge-primary');
     }
     else if ($('#other_user_status_2').hasClass('badge-danger')) {
-        $('#other_user_status_2').removeClass('badge-danger');
-        $('#other_user_status_2').addClass('badge-primary');
+            $('#other_user_status_2').removeClass('badge-danger');
+            $('#other_user_status_2').addClass('badge-primary');
     }
     else if ($('#other_user_status_3').hasClass('badge-danger')) {
-        $('#other_user_status_3').removeClass('badge-danger');
-        $('#other_user_status_3').addClass('badge-primary');
+            $('#other_user_status_3').removeClass('badge-danger');
+            $('#other_user_status_3').addClass('badge-primary');
     }
 });
+
 
 socket.on('stop_user', function(msg) {
     $('#game_submit').prop('disabled',true);
     $('#game_explain').text(msg);
     $('#time_limit').css('display', 'none');
-})
+});

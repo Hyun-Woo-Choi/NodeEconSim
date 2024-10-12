@@ -86,8 +86,9 @@ module.exports = function(io) {
   // 파라미터 불러와서 뿌려줌
   router.post('/patch_parameter', function(req, res, next) {
     var type_val = req.body.type_val;
-    if (type_val === '1') {
-      db.query('SELECT * FROM parameter', function(err, whole_parameter) {
+
+    if (type_val === '1' || type_val === '2' || type_val === '3') {
+      db.query('SELECT * FROM disaster_parameter', function(err, whole_parameter) {
         if (err) {
           console.log('admin', err);
           res.redirect('/admin');
@@ -98,8 +99,8 @@ module.exports = function(io) {
           for (var key in whole_parameter[0]) {
             parameters.push(whole_parameter[0][key]);
           }
-          var input_ids = ["init_w", "contri_var", "beef_w", "chicken_w", "beef_cost_var", "beef_cost_b", 
-                            "beef_cost_c", "chicken_cost_var", "chicken_cost_b", "chicken_cost_c", "init_budget", "loan"]
+          var input_ids = ["init_w", "adjusted_w", "price_var", "init_budget", "disaster_probability", "disaster_number"]
+
           for (var i = 0; i < input_ids.length; ++i) {
             return_html += `<div class="form-group row"> <label for=${input_ids[i]} class="col-4 col-form-label">${input_ids[i]}</label>
               <div class="col-8">
@@ -112,46 +113,16 @@ module.exports = function(io) {
           res.send(return_html);
         }
       });
-    }
-    else {
-      db.query('SELECT * FROM parameter2', function(err, whole_parameter) {
-        if (err) {
-          console.log('admin', err);
-          res.redirect('/admin');
-        }
-        else {
-          var return_html = '<form method="post" action="/admin/set_parameter">';
-          var parameters = [];
-          for (var key in whole_parameter[0]) {
-            parameters.push(whole_parameter[0][key]);
-          }
-          var input_ids = ["init_w", "contri_var", "beef_w", "chicken_w", "beef_cost_var", "beef_cost_b", 
-                            "beef_cost_c", "chicken_cost_var", "chicken_cost_b", "chicken_cost_c", "init_budget", "loan", "change_var", "change_weight"]
-          for (var i = 0; i < input_ids.length; ++i) {
-            return_html += `<div class="form-group row"> <label for=${input_ids[i]} class="col-4 col-form-label">${input_ids[i]}</label>
-              <div class="col-8">
-                <input type="text" class="form-control" id=${input_ids[i]} name=${input_ids[i]} value=${parameters[i]} required="true"> </div>
-            </div>`
-          }
-          return_html += `<input type="hidden" id="type_val" name="type_val" value=${type_val}>`
-          return_html += '<button type="submit" class="btn btn-primary" style="float: right;">Submit</button>';
-          return_html += '</form>';
-          res.send(return_html);
-        }
-      });
-    }
-  });
+    }})
 
   // 파라미터 조정
   router.post('/set_parameter', function(req, res, next) {
     var post = req.body;
     var type_val = post.type_val;
 
-    if (type_val === '1') {
-      var sql = 'UPDATE parameter SET init_w=?, contri_var=?, beef_w=?, chicken_w=?, beef_cost_var=?, beef_cost_b=?,\
-      beef_cost_c=?, chicken_cost_var=?, chicken_cost_b=?, chicken_cost_c=?, init_budget=?, loan=?';
-      var params = [post.init_w, post.contri_var, post.beef_w, post.chicken_w, post.beef_cost_var, post.beef_cost_b,
-      post.beef_cost_c, post.chicken_cost_var, post.chicken_cost_b, post.chicken_cost_c, post.init_budget, post.loan];
+    if (type_val === '1' || type_val === '2' || type_val === '3') {
+      var sql = 'UPDATE disaster_parameter SET init_w=?, adjusted_w=?, price_var=?, init_budget=?, disaster_probability=?, disaster_number=?';
+      var params = [post.init_w, post.adjusted_w, post.price_var, post.init_budget, post.disaster_probability, post.disaster_number];
       db.query(sql, params, function(err, result) {
         if (err) {
           res.cookie('admin_status', res.__('set_parameter_fail'));
@@ -162,28 +133,12 @@ module.exports = function(io) {
           res.redirect('/admin');
         }
       });
-    }
-    else {
-      var sql = 'UPDATE parameter2 SET init_w=?, contri_var=?, beef_w=?, chicken_w=?, beef_cost_var=?, beef_cost_b=?,\
-      beef_cost_c=?, chicken_cost_var=?, chicken_cost_b=?, chicken_cost_c=?, init_budget=?, loan=?, change_var=?, change_weight=?';
-      var params = [post.init_w, post.contri_var, post.beef_w, post.chicken_w, post.beef_cost_var, post.beef_cost_b,
-      post.beef_cost_c, post.chicken_cost_var, post.chicken_cost_b, post.chicken_cost_c, post.init_budget, post.loan, post.change_var, post.change_weight];
-      db.query(sql, params, function(err, result) {
-        if (err) {
-          res.cookie('admin_status', res.__('set_parameter_fail'));
-          res.redirect('/admin');
-        }
-        else {
-          res.cookie('admin_status', res.__('set_parameter_success'));
-          res.redirect('/admin');
-        }
-      });
-    }
-  });
+    }});
 
   // 방 생성
   router.post('/make_one_room', function(req, res, next) {
     var type_val = req.body.type_val;
+
     db.query('INSERT INTO game_info (game_type) VALUES(?)', [type_val], function(err, result) {
       if (err) {
         console.log('admin', err);
@@ -195,11 +150,7 @@ module.exports = function(io) {
           }
           else {
             var sql_parameter;
-            if (type_val == '1')
-              sql_parameter = 'SELECT * FROM parameter';
-            else
-              sql_parameter = 'SELECT * FROM parameter2';
-            
+            var sql_parameter = 'SELECT * FROM disaster_parameter';
             var next_room_id = game_list[game_list.length - 1].room_id;
             db.query(sql_parameter, function(err5, parameters) {
               if (err5) {
@@ -208,23 +159,13 @@ module.exports = function(io) {
               else {
                 var game_parameter_sql;
                 var game_parameter_parameter;
-                if (type_val == '1') {
-                  game_parameter_sql = 'INSERT INTO game_parameter (room_id, init_w, contri_var, beef_w, chicken_w, beef_cost_var, beef_cost_b,\
-                  beef_cost_c, chicken_cost_var, chicken_cost_b, chicken_cost_c, init_budget, loan, change_var, change_weight) \
-                  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-                  game_parameter_parameter = [next_room_id, parameters[0].init_w, parameters[0].contri_var, parameters[0].beef_w, parameters[0].chicken_w, 
-                  parameters[0].beef_cost_var, parameters[0].beef_cost_b, parameters[0].beef_cost_c, parameters[0].chicken_cost_var, parameters[0].chicken_cost_b, 
-                  parameters[0].chicken_cost_c, parameters[0].init_budget, parameters[0].loan, -1, -1];
-                }
-                else {
-                  game_parameter_sql = 'INSERT INTO game_parameter (room_id, init_w, contri_var, beef_w, chicken_w, beef_cost_var, beef_cost_b,\
-                  beef_cost_c, chicken_cost_var, chicken_cost_b, chicken_cost_c, init_budget, loan, change_var, change_weight) \
-                  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-                  game_parameter_parameter = [next_room_id, parameters[0].init_w, parameters[0].contri_var, parameters[0].beef_w, parameters[0].chicken_w, 
-                  parameters[0].beef_cost_var, parameters[0].beef_cost_b, parameters[0].beef_cost_c, parameters[0].chicken_cost_var, parameters[0].chicken_cost_b, 
-                  parameters[0].chicken_cost_c, parameters[0].init_budget, parameters[0].loan, parameters[0].change_var, parameters[0].change_weight];
-                }
 
+                  game_parameter_sql = 'INSERT INTO game_parameter (room_id, init_w, adjusted_w, price_var, init_budget, disaster_probability, isdisasteroccured,\
+                    first_disaster, second_disaster, total_energy, disaster_number) \
+                  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+                  game_parameter_parameter = [next_room_id, parameters[0].init_w, parameters[0].adjusted_w, parameters[0].price_var, parameters[0].init_budget, 
+                  parameters[0].disaster_probability, parameters[0].isdisasteroccured, parameters[0].first_disaster, parameters[0].second_disaster, parameters[0].total_energy, parameters[0].disaster_number];
+                
                 db.query(game_parameter_sql, game_parameter_parameter, function(err6, result) {
                   if (err6) {
                     console.log('admin', err6);
@@ -257,6 +198,47 @@ module.exports = function(io) {
       }
     });
   });
+
+  router.post('/assign_province', function(req, res, next) {
+    db.query('SELECT room_id FROM game_info ORDER BY room_id ASC', function(err, results) {
+      if (err) {
+        console.log('admin province error', err);
+        return res.status(500).send('Error retrieving game rooms');
+      }
+  
+      const game_list = results;
+      if (game_list.length === 0) {
+        return res.status(404).send('No game rooms found');
+      }
+  
+      let province_id = 1;
+      const province_n = 3;
+  
+      const updateProvince = function(index) {
+        if (index >= game_list.length) {
+          return res.send('Provinces assigned successfully');
+        }
+  
+        const room_id = game_list[index].room_id;
+        db.query('UPDATE game_info SET province_id = ? WHERE room_id = ?', [province_id, room_id], function(updateErr) {
+          if (updateErr) {
+            console.log('admin province error', updateErr);
+            return res.status(500).send('Error assigning provinces');
+          }
+  
+          if ((index + 1) % province_n === 0) {
+            province_id++;
+          }
+  
+          updateProvince(index + 1);
+        });
+      };
+  
+      updateProvince(0);
+    });
+  });
+  
+
 
   // 방 생성하고 랜덤으로 유저 배치
   router.post('/make_all_room', function(req, res, next) {
@@ -328,14 +310,10 @@ module.exports = function(io) {
                     next_room_id += 1;
                   }
                 }
-                
                 // set room parameter
                 to_room = next_room_id;
                 var sql_parameter;
-                if (type_val == '1')
-                  sql_parameter = 'SELECT * FROM parameter';
-                else
-                  sql_parameter = 'SELECT * FROM parameter2';
+                var sql_parameter = 'SELECT * FROM disaster_parameter';
                 db.query(sql_parameter, function(err5, parameters) {
                   if (err5) {
                     console.log('admin', err5);
@@ -343,23 +321,14 @@ module.exports = function(io) {
                   else {
                     var game_parameter_sql;
                     var game_parameter_parameter;
-                    if (type_val == '1') {
-                      game_parameter_sql = 'INSERT INTO game_parameter (room_id, init_w, contri_var, beef_w, chicken_w, beef_cost_var, beef_cost_b,\
-                      beef_cost_c, chicken_cost_var, chicken_cost_b, chicken_cost_c, init_budget, loan, change_var, change_weight) \
-                      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-                      game_parameter_parameter = [next_room_id, parameters[0].init_w, parameters[0].contri_var, parameters[0].beef_w, parameters[0].chicken_w, 
-                      parameters[0].beef_cost_var, parameters[0].beef_cost_b, parameters[0].beef_cost_c, parameters[0].chicken_cost_var, parameters[0].chicken_cost_b, 
-                      parameters[0].chicken_cost_c, parameters[0].init_budget, parameters[0].loan, -1, -1];
-                    }
-                    else {
-                      game_parameter_sql = 'INSERT INTO game_parameter (room_id, init_w, contri_var, beef_w, chicken_w, beef_cost_var, beef_cost_b,\
-                      beef_cost_c, chicken_cost_var, chicken_cost_b, chicken_cost_c, init_budget, loan, change_var, change_weight) \
-                      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-                      game_parameter_parameter = [next_room_id, parameters[0].init_w, parameters[0].contri_var, parameters[0].beef_w, parameters[0].chicken_w, 
-                      parameters[0].beef_cost_var, parameters[0].beef_cost_b, parameters[0].beef_cost_c, parameters[0].chicken_cost_var, parameters[0].chicken_cost_b, 
-                      parameters[0].chicken_cost_c, parameters[0].init_budget, parameters[0].loan, parameters[0].change_var, parameters[0].change_weight];
-                    }
 
+                    game_parameter_sql = 'INSERT INTO game_parameter (room_id, init_w, adjusted_w, price_var, init_budget, disaster_probability, isdisasteroccured,\
+                        first_disaster, second_disaster, total_energy, disaster_number) \
+                      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+                    
+                    game_parameter_parameter = [next_room_id, parameters[0].init_w, parameters[0].adjusted_w, parameters[0].price_var, parameters[0].init_budget, 
+                    parameters[0].disaster_probability, parameters[0].isdisasteroccured, parameters[0].first_disaster, parameters[0].second_disaster, parameters[0].total_energy, parameters[0].disaster_number];
+                    
                     for (var temp = from_room; temp <= to_room; ++temp) {
                       var now_paramter = game_parameter_parameter;
                       now_paramter[0] = temp;
@@ -372,7 +341,7 @@ module.exports = function(io) {
                     res.send('done');
                   }
                 });  
-              }
+              }   
             });
           }
         });
@@ -383,7 +352,7 @@ module.exports = function(io) {
   // 새로고침 하면 방을 불러옴
   router.post('/load_game_info', function(req, res, next) {
     var var_room_html = "";
-    db.query('SELECT room_id, game_type, room_status FROM game_info', function(err, game_list) {
+    db.query('SELECT room_id, province_id, game_type, room_status FROM game_info', function(err, game_list) {
       if (err) {
         console.log('admin', err);
       }
@@ -406,12 +375,13 @@ module.exports = function(io) {
                   var now_game_info = game_list[i];
                   var now_room_stauts = now_game_info.room_status;
                   var wrap_room_id = "wrap_room" + now_game_info.room_id;
-                  var round_room_id = "round" + now_game_info.room_id;
+                  var round_room_id = "Round" + now_game_info.room_id;
+                  var room_province_id = "Province" + now_game_info.province_id;
                   var now_round = (now_game_info.room_id in room_round_cnt ? room_round_cnt[now_game_info.room_id] : 1);
                   var_room_html += `
                   <div class="col-md-3 mb-3" id=${wrap_room_id}>
                     <div class="card text-center">
-                      <div class="card-header" > Room: ${now_game_info.room_id}, type: ${now_game_info.game_type}, round: <span id=${round_room_id}>${now_round}</span> <button type="button" class="delete_room_class close ml-auto" data-id=${now_game_info.room_id}> <span>x</span> </button> </div>
+                      <div class="card-header" > Province: ${now_game_info.province_id}, Room: ${now_game_info.room_id}, Type: ${now_game_info.game_type}, Round: <span id=${round_room_id}>${now_round}</span> <button type="button" class="delete_room_class close ml-auto" data-id=${now_game_info.room_id}> <span>x</span> </button> </div>
                       <div class="card-body" id=${now_game_info.room_id}>`;
                   
                   for (var j = 0; j < user_list.length; ++j) { // 사용자 상태 창
@@ -748,7 +718,7 @@ module.exports = function(io) {
                       if (err3)
                         console.log('admin game end err', err3);
                       else {
-                        if (cur_round <= 15) // 7 + 1 (contribution) + 7 is end, 게임 제한 시간을 만들고 사용자에게 알림
+                        if (cur_round <= 33) // 7 + 1 (contribution) + 1 + 5 + 1 + 1 + 5 + 1 + 1 is end, 게임 제한 시간을 만들고 사용자에게 알림
                           game_control.make_room_timer(selected_room_val, cur_round + 1, io);
                         for (var i = 0; i < user_list.length; ++i) {
                           var now_id = user_list[i].id;
@@ -796,11 +766,27 @@ module.exports = function(io) {
           var admin_key = jsonData[i]['round'] + '_' + jsonData[i]['room_id'];
           jsonData[i]['start_time'] =  Math.floor((jsonData[i]['start_time'] - admin_start_time[admin_key]) / 1000); // 사용자가 제출한 시간 계산
 
-          if (jsonData[i]['round'] > 8)
-            jsonData[i]['round'] -= 1;
-          else if (jsonData[i]['round'] == 8) // 커뮤니티 프로젝트
-            jsonData[i]['round'] = 'Contribution';
 
+          if (jsonData[i]['round'] >= 1 && jsonData[i]['round'] < 6)
+            jsonData[i]['round'] = 'Practice';
+          
+          else if (jsonData[i]['round'] == 6)
+            jsonData[i]['round'] = 'Practice Contribution';
+
+          else if (jsonData[i]['round'] == 7)
+            jsonData[i]['round'] = 'Practice Satisfaction';
+          
+          else if (jsonData[i]['round'] > 7 && jsonData[i]['round'] < 13)
+            jsonData[i]['round'] -= 7;
+          else if (jsonData[i]['round'] == 13 || jsonData[i]['round'] == 20 || jsonData[i]['round'] == 27) // 커뮤니티 프로젝트
+            jsonData[i]['round'] = 'Contribution';
+          else if (jsonData[i]['round'] == 14 || jsonData[i]['round'] == 21 || jsonData[i]['round'] == 28) // 커뮤니티 프로젝트
+            jsonData[i]['round'] = 'Satisfaction';
+          else if (jsonData[i]['round'] > 14 && jsonData[i]['round'] < 20)
+            jsonData[i]['round'] -= 11;
+          else if (jsonData[i]['round'] > 21 && jsonData[i]['round'] < 27)
+            jsonData[i]['round'] -= 13;
+          
           writeData.push(jsonData[i]);
         }
         var now_time = new Date();

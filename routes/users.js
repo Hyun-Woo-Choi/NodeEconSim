@@ -62,6 +62,7 @@ module.exports = function(io) {
     db.query('SELECT status FROM users WHERE id=?', [req.session.user_id], function(err, result) {
       if (err) {
         console.log(err, req.session.user_id);
+        res.redirect('/');
       }
       else {
         if (result[0].status === 1 || result[0].status === 2) { // user not in game
@@ -69,6 +70,7 @@ module.exports = function(io) {
           db.query('UPDATE users SET status=? WHERE id=?', [now_status, req.session.user_id], function(err2, result2) {
             if (err2) {
               console.log(err2, req.session.user_id);
+              res.redirect('/');
             }
             else {
               io.message(io.user_2_socket_id['admin'], 'change_user_status', {
@@ -82,6 +84,5 @@ module.exports = function(io) {
       }
     });
   });
-
   return router;
 }
