@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+  <link rel="stylesheet" href="stylesheets/theme.css" type="text/css">
+  <style>
+    html,body {height:100%; margin:0; padding:0;}
+  </style>
+  <title><%= __('title') %></title>
+</head>
+
+<body style="display: flex; flex-direction: column;">
+  <div style="flex-grow: 1">
+    <!-- ko / en -->
+    <nav class="navbar navbar-expand-md navbar-light border-bottom border-gray bg-light" >
+      <div class="container">
+        <a class="navbar-brand" href="/"><img class="img-fluid" src="images/title_water_re.png" style="width:100px";></a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarLightSupportedContent" aria-controls="navbar2SupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span> </button>
+        <div class="collapse navbar-collapse text-center justify-content-end" id="navbarLightSupportedContent">
+          <ul class="navbar-nav">
+            <li class="nav-item mx-1">
+              <% if (cookie_lang === 'ko') { %>
+                <a class="nav-link nav_pointer" style="font-weight: bold;"><u>ko</u></a>
+              <% } else { %>
+                <a class="nav-link nav_pointer" href="/admin/ko">ko</a>
+              <% } %>
+            </li>
+            <li class="nav-item mx-1">
+              <% if (cookie_lang === 'en') { %>
+                <a class="nav-link nav_pointer" style="font-weight: bold;"><u>en</u></a>
+              <% } else { %>
+                <a class="nav-link nav_pointer" href="/admin/en">en</a>
+              <% } %>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 사용자 생성, 방 생성 알림 메세지 -->
+    <small class="form-text text-muted text-center w-50 mx-auto bg-light">
+      <a><%= admin_status %></a>
+    </small>
+
+    <!-- 관리자 기능 navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light border-bottom border-success w-75 mt-3 mx-auto" >
+      <div class="container">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar5" aria-controls="navbar2SupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span> </button>
+        <div class="collapse navbar-collapse text-center justify-content-end" id="navbar5">
+          <ul class="navbar-nav mr-auto">
+            <a class="btn btn-outline-primary navbar-btn ml-md-2" id="signout_button"><%= __('admin_logout') %></a> </li>
+            <a class="btn btn-outline-primary navbar-btn ml-md-2" data-toggle="modal" data-target="#make_one_id"><%= __('admin_makeId') %></a> </li>
+          </ul>
+          <ul class="navbar-nav mx-auto" >
+            <a class="btn btn-outline-primary navbar-btn ml-md-2" data-toggle="modal" data-target="#set_parameter"><%= __('admin_parameter') %></a> </li>
+            <a class="btn btn-outline-primary navbar-btn ml-md-2" data-toggle="modal" data-target="#make_one_room"><%= __('admin_makeRoom') %></a> </li>
+            <a class="btn btn-outline-primary navbar-btn ml-md-2" data-toggle="modal" data-target="#make_all_room"><%= __('admin_makeAll') %></a> </li>
+          </ul>
+          <ul class="navbar-nav ml-auto">
+            <a class="btn btn-outline-primary navbar-btn ml-md-2" id="download_record"><%= __('admin_record') %></a>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- start modal -->
+    <!-- 아이디 생성 -->
+    <div class="modal mt-6" id="make_one_id" >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header" >
+            <h5 class="modal-title"><%= __('admin_modal_makeId') %></h5> <button type="button" class="close" data-dismiss="modal"> <span>×</span> </button>
+          </div>
+          <div class="modal-body">
+            <form method="post" action="/admin/make_one_id">
+              <div class="form-group"> <input type="text" class="form-control" placeholder="Enter id" name="input_id" required="true"> </div>
+              <div class="form-group mb-3"> <input type="text" class="form-control" placeholder="Password" name="input_password" required="true"> </div>
+              <button type="submit" class="btn btn-primary" style="float: right;">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 파라미터 조정 -->
+    <div class="modal" id="set_parameter" >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header" >
+            <h5 class="modal-title"><%= __('admin_modal_setParamter') %></h5> <button type="button" class="close" data-dismiss="modal"> <span>×</span> </button>
+          </div>
+          <div class="row mt-3 mx-auto">
+            <div class="col-md text-center">
+              <p style="white-space: nowrap;"><%= __('admin_modal_selectGameType') %></p>
+            </div>
+            <div class="col-md">
+              <div class="form-group" ><select class="form-control" id="game_type">
+                <option value="0"></option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select></div>
+            </div>
+          </div>
+          <div class="modal-body" id="set_parameter_body">
+            <!-- load paramters -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 방 하나 생성 -->
+    <div class="modal mt-6" id="make_one_room" >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header" >
+            <h5 class="modal-title"><%= __('admin_modal_makeRoom') %></h5> <button type="button" class="close" data-dismiss="modal"> <span>×</span> </button>
+          </div>
+          <div class="row" >
+            <div class="col-12">
+              <a class="btn btn-primary m-2" id="make_one_room_1">type 1</a>
+              <a class="btn btn-primary m-2" id="make_one_room_2">type 2</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 방 생성 후 유저 랜덤 배치 -->
+    <div class="modal mt-6" id="make_all_room" >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header" >
+            <h5 class="modal-title"><%= __('admin_modal_makeAll') %></h5> <button type="button" class="close" data-dismiss="modal"> <span>×</span> </button>
+          </div>
+          <div class="row" >
+            <div class="col-12">
+              <a class="btn btn-primary m-2" id="make_all_room_1">type 1</a>
+              <a class="btn btn-primary m-2" id="make_all_room_2">type 2</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 사용자 방에 넣음 -->
+    <div class="modal" id="add_user_room" >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header" >
+            <h5 class="modal-title" id="selected_user">selected user</h5> <button type="button" class="close" data-dismiss="modal"> <span>×</span> </button>
+          </div>
+          <div class="row mt-3 mx-auto">
+            <div class="col-md">
+              <p style="white-space: nowrap;"><%= __('admin_modal_selectRoom') %></p>
+              <div class="form-group" ><select class="form-control" id="room_number">
+                <!-- add option -->
+              </select></div>
+            </div>
+          </div>
+          <div class="modal-footer" >
+            <button class="btn btn-primary" style="float: right;" id="user_2_room">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end modal -->
+
+    <!-- 방, 사용자 정보 -->
+    <div class="container-fluid mt-3">
+      <div class="row">
+        <div class="col-md-10">
+          <div class="row" id="room_info">
+            <!-- add room info -->
+          </div>
+        </div>
+        <div class="col-md-2 border-left border-danger px-3" id="user_info">
+          <!-- add user name -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="pt-2 border-top border-gray bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <p>© 2020 Cournot. All rights reserved</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="javascripts/admin_socket.js"></script>
+  <script>
+    $(function() {
+      admin_socket.connect_user('admin');
+
+      function load_game_user_info() {
+        $.ajax({
+          type : 'POST',
+          url : '/admin/load_game_info',
+          success : function(result) {
+            $('#room_info').html(result);
+            $.ajax({
+              type : 'POST',
+              url : '/admin/load_user_info',
+              success : function(result) {
+                $('#user_info').html(result);
+              }
+            })
+          }
+        })
+      }
+
+      load_game_user_info();
+
+      $('#download_record').click( function() {
+        var yes_or_no = confirm('download');
+        if (yes_or_no) {
+          $.ajax({
+            type : 'POST',
+            url : '/admin/download_record'
+          });
+        }
+      });
+
+      $('#signout_button').click( function() {
+        if ('<%= cookie_lang %>' == 'ko')
+          var yes_or_no = confirm('로그아웃 하시겠습니까?');
+        else
+          var yes_or_no = confirm('Are you sure you want to log out?');
+        if (yes_or_no)
+          location.replace('/admin/signout');
+      });
+
+      $('#game_type').change( function() {
+        var selected_val = $(this).val();
+        if (selected_val === '0')
+          $('#set_parameter_body').html('');
+        else {
+          $.ajax({
+            type : 'POST',
+            url : '/admin/patch_parameter',
+            data : {type_val:selected_val},
+            success : function(result) {
+              $('#set_parameter_body').html(result);
+            }
+          });
+        }
+      });
+
+      $('#make_one_room_1').click( function() {
+        $.ajax({
+          type : 'POST',
+          url : '/admin/make_one_room',
+          data : {type_val:1},
+          success : function(result) {
+            $('#room_info').append(result);
+          }
+        });
+
+        $('#make_one_room').modal('hide');
+      });
+
+      $('#make_one_room_2').click( function() {
+        $.ajax({
+          type : 'POST',
+          url : '/admin/make_one_room',
+          data : {type_val:2},
+          success : function(result) {
+            $('#room_info').append(result);
+          }
+        });
+
+        $('#make_one_room').modal('hide');
+      });
+      
+      $('#make_all_room_1').click( function() {
+        $('#make_all_room').modal('hide');
+        $.ajax({
+          type : 'POST',
+          url : '/admin/make_all_room',
+          data : {type_val:1},
+          success : function(result) {
+            location.reload();
+          }
+        });
+      });
+
+      $('#make_all_room_2').click( function() {
+        $('#make_all_room').modal('hide');
+        $.ajax({
+          type : 'POST',
+          url : '/admin/make_all_room',
+          data : {type_val:2},
+          success : function(result) {
+            location.reload();
+          }
+        });
+      });
+      
+      $(document).on("click", ".add_user_room_class", function () {
+        var eventId = $(this).data('id');
+        $('#selected_user').text( eventId );
+
+        $.ajax({
+          type : 'POST',
+          url : '/admin/load_room_number',
+          success : function(result) {
+            $('#room_number').html(result);
+          }
+        });
+      });
+
+      $(document).on("click", ".delete_user_room_class", function () {
+        if ('<%= cookie_lang %>' == 'ko')
+          var yes_or_no = confirm('방에서 삭제?');
+        else
+          var yes_or_no = confirm('Delete from room?');
+        if (yes_or_no) {
+          var target_selected_user = $(this).data('id');
+          $.ajax({
+            type : 'POST',
+            url : '/admin/out_user_room',
+            data : {selected_user_val:target_selected_user},
+            success : function(result) {
+              $('#user_info').append(result)
+              $('#room'+target_selected_user).remove();
+            }
+          });
+        }
+      });
+
+      $(document).on("click", ".delete_room_class", function () {
+        if ('<%= cookie_lang %>' == 'ko')
+          var yes_or_no = confirm('방 삭제?');
+        else
+          var yes_or_no = confirm('Delete room?');
+        if (yes_or_no) {
+          var target_room_id = $(this).data('id');
+          $.ajax({
+            type : 'POST',
+            url : '/admin/delete_room',
+            data : {selected_room_val:target_room_id},
+            success : function(result) {
+              $('#user_info').append(result)
+              $('#wrap_room'+target_room_id).remove();
+            }
+          });
+        }
+      });
+
+      $('#user_2_room').click( function() {
+        var target_room_number = $("#room_number :selected").val();
+        var target_selected_user = $('#selected_user').text();
+        $.ajax({
+          type : 'POST',
+          url : '/admin/user_2_room',
+          data : {room_number_val:target_room_number,
+                  selected_user_val:target_selected_user},
+          success : function(result) {
+            $('#'+target_room_number).append(result);
+            $('#'+target_selected_user).remove();
+          }
+        });
+
+        $('#add_user_room').modal('hide');
+      });
+
+      $(document).on("click", ".start_room_class", function () {
+        if ('<%= cookie_lang %>' == 'ko')
+          var yes_or_no = confirm('게임 시작?');
+        else
+          var yes_or_no = confirm('Start game?');
+        if (yes_or_no) {
+          var target_room_id = $(this).data('id');
+          if ($('#start'+target_room_id).text() == '<%= start_text %>') {
+            $.ajax({
+              type : 'POST',
+              url : '/admin/start_room',
+              data : {selected_room_val:target_room_id},
+              success : function(result) {
+                  $('#start'+target_room_id).prop('disabled', true);
+                  $('#start'+target_room_id).text('<%= restart_text %>');
+                  $('#stop'+target_room_id).prop('disabled', false);
+              }
+            });
+          }
+          else {
+            $.ajax({
+              type : 'POST',
+              url : '/admin/restart_room',
+              data : {selected_room_val:target_room_id},
+              success : function(result) {
+                  $('#start'+target_room_id).prop('disabled', true);
+                  $('#stop'+target_room_id).prop('disabled', false);
+              }
+            });
+          }
+        }
+      });
+
+      $(document).on("click", ".stop_room_class", function () {
+        if ('<%= cookie_lang %>' == 'ko')
+          var yes_or_no = confirm('게임 멈춤?');
+        else
+          var yes_or_no = confirm('Stop room?');
+        if (yes_or_no) {
+          var target_room_id = $(this).data('id');
+          $.ajax({
+            type : 'POST',
+            url : '/admin/stop_room',
+            data : {selected_room_val:target_room_id},
+            success : function(result) {
+              $('#stop'+target_room_id).prop('disabled', true);
+              $('#start'+target_room_id).prop('disabled', false);
+              $('#round'+target_room_id).text('stop');
+            }
+          });
+        }
+      });
+
+    });
+  </script>
+</body>
+
+</html>
