@@ -33,17 +33,17 @@ module.exports = function(io) {
     }
   });
 
-  router.get('/ko', function(req, res, next) {
+  router.get('/ko', function(req, res, next) { // 한국어
     res.cookie('lang', 'ko');
     res.redirect('/admin');
   });
 
-  router.get('/en', function(req, res, next) {
+  router.get('/en', function(req, res, next) { // 영어
     res.cookie('lang', 'en');
     res.redirect('/admin');
   });
 
-  router.get('/signout', function(req, res, next) {
+  router.get('/signout', function(req, res, next) { //로그아웃
     req.session.destroy(function(err) {
       if(err)
         console.log(err);
@@ -52,7 +52,7 @@ module.exports = function(io) {
     })
   });
 
-  router.post('/make_one_id', function(req, res, next) {
+  router.post('/make_one_id', function(req, res, next) { // id 생성
     var input_id = req.body.input_id;
     var input_password = req.body.input_password;
     db.query('SELECT id FROM users WHERE id=?', [input_id], function(err, info) {
@@ -199,6 +199,7 @@ module.exports = function(io) {
     });
   });
 
+  // 3개의 그룹마다 동일한 Province_id 형성
   router.post('/assign_province', function(req, res, next) {
     db.query('SELECT room_id FROM game_info ORDER BY room_id ASC', function(err, results) {
       if (err) {
@@ -718,7 +719,7 @@ module.exports = function(io) {
                       if (err3)
                         console.log('admin game end err', err3);
                       else {
-                        if (cur_round <= 33) // 7 + 1 (contribution) + 1 + 5 + 1 + 1 + 5 + 1 + 1 is end, 게임 제한 시간을 만들고 사용자에게 알림
+                        if (cur_round <= 32) // 5 + 1 (연습), 5 + 1 + 1 / 5 + 1 + 1 / 5 + 1 + 1/ 5 is end, 게임 제한 시간을 만들고 사용자에게 알림
                           game_control.make_room_timer(selected_room_val, cur_round + 1, io);
                         for (var i = 0; i < user_list.length; ++i) {
                           var now_id = user_list[i].id;
@@ -741,65 +742,80 @@ module.exports = function(io) {
     });
   });
 
-  // 게임 기록 csv 다운로드
-  router.post('/download_record', function(req, res, next) {
-    db.query("SELECT * FROM game_record ORDER BY room_id, round, id", function(err, result) {
+// 게임 기록 csv 다운로드
+router.post('/download_record', function(req, res, next) {
+  // game_record 테이블에서 모든 게임 기록을 가져와 room_id, round, id 순으로 정렬
+  db.query("SELECT * FROM game_record ORDER BY room_id, round, id", function(err, result) {
       if (err) {
-        console.log('write game record', err);
-      }
-      else {
-        var jsonData = JSON.parse(JSON.stringify(result));
-        var admin_start_time = {}
-        // 관리자가 시작한 시간을 가져옴
-        for (var i = 0;  i < jsonData.length; ++i) {
-          if (jsonData[i]['id'] == 'admin') {
-            var admin_key = jsonData[i]['round'] + '_' + jsonData[i]['room_id'];
-            admin_start_time[admin_key] = jsonData[i]['start_time'];
+          console.log('write game record', err); // 오류 발생 시 로그 출력
+      } else {
+          // 결과를 JSON 형식으로 변환
+          var jsonData = JSON.parse(JSON.stringify(result));
+          var admin_start_time = {}; // 관리자가 시작한 시간을 저장할 객체
+
+          // 관리자가 시작한 시간을 가져옴 (admin의 start_time)
+          for (var i = 0; i < jsonData.length; ++i) {
+              if (jsonData[i]['id'] == 'admin') {
+                  var admin_key = jsonData[i]['round'] + '_' + jsonData[i]['room_id']; // 라운드와 방 ID를 key로 사용
+                  admin_start_time[admin_key] = jsonData[i]['start_time']; // 해당 라운드의 시작 시간을 기록
+              }
           }
+
+          var writeData = []; // CSV에 쓸 데이터를 저장할 배열
+          for (var i = 0; i < jsonData.length; ++i) {
+              if (jsonData[i]['id'] == 'admin') // 관리자 기록은 무시
+                  continue;
+
+              var admin_key = jsonData[i]['round'] + '_' + jsonData[i]['room_id']; // 해당 라운드와 방 ID의 key 설정
+              // 사용자가 제출한 시간을 계산 (관리자의 시작 시간에서 사용자의 제출 시간을 뺌)
+              jsonData[i]['start_time'] = Math.floor((jsonData[i]['start_time'] - admin_start_time[admin_key]) / 1000);
+
+              // Practice 라운드 처리
+              if (jsonData[i]['round'] >= 1 && jsonData[i]['round'] < 6)
+                  jsonData[i]['round'] = 'Practice';
+
+              // Practice Contribution 라운드
+              else if (jsonData[i]['round'] == 6)
+                  jsonData[i]['round'] = 'Practice Contribution';
+
+              // 7라운드를 제거하고 8~12 라운드 -> 7~11로 이동
+              else if (jsonData[i]['round'] > 6 && jsonData[i]['round'] < 12)
+                  jsonData[i]['round'] -= 6;
+
+              // 커뮤니티 프로젝트 Contribution 라운드 (12, 19, 26)
+              else if (jsonData[i]['round'] == 12 || jsonData[i]['round'] == 19 || jsonData[i]['round'] == 26)
+                  jsonData[i]['round'] = 'Contribution';
+
+              // 커뮤니티 프로젝트 Satisfaction 라운드 (13, 20, 27)
+              else if (jsonData[i]['round'] == 13 || jsonData[i]['round'] == 20 || jsonData[i]['round'] == 27)
+                  jsonData[i]['round'] = 'Satisfaction';
+
+              // 14~18 라운드는 7~11로 이동
+              else if (jsonData[i]['round'] > 13 && jsonData[i]['round'] < 19)
+                  jsonData[i]['round'] -= 10;
+
+              // 21~25 라운드는 9~14로 이동
+              else if (jsonData[i]['round'] > 20 && jsonData[i]['round'] < 26)
+                  jsonData[i]['round'] -= 12;
+
+              // 수정된 데이터를 writeData 배열에 추가
+              writeData.push(jsonData[i]);
+          }
+
+          // 현재 시간을 기준으로 csv 파일 이름 생성
+          var now_time = new Date();
+          var csv_file_name = "game_record_" + now_time.getDate() + "_" + now_time.getHours() + "_" + now_time.getMinutes() + ".csv";
+
+          // CSV 파일 생성 및 기록
+          const ws = fs.createWriteStream(csv_file_name);
+          fastcsv
+              .write(writeData, { headers: true }) // 헤더와 함께 데이터를 CSV에 작성
+              .on("finish", function() {
+                  console.log("Write to game_record.csv successfully!"); // 완료 후 로그 출력
+                  res.send(''); // 응답 전송
+              })
+              .pipe(ws); // CSV 데이터를 파일에 기록
         }
-
-        var writeData = []
-        for (var i = 0;  i < jsonData.length; ++i) {
-          if (jsonData[i]['id'] == 'admin') // 관리자 기록 무시
-            continue;
-
-          var admin_key = jsonData[i]['round'] + '_' + jsonData[i]['room_id'];
-          jsonData[i]['start_time'] =  Math.floor((jsonData[i]['start_time'] - admin_start_time[admin_key]) / 1000); // 사용자가 제출한 시간 계산
-
-
-          if (jsonData[i]['round'] >= 1 && jsonData[i]['round'] < 6)
-            jsonData[i]['round'] = 'Practice';
-          
-          else if (jsonData[i]['round'] == 6)
-            jsonData[i]['round'] = 'Practice Contribution';
-
-          else if (jsonData[i]['round'] == 7)
-            jsonData[i]['round'] = 'Practice Satisfaction';
-          
-          else if (jsonData[i]['round'] > 7 && jsonData[i]['round'] < 13)
-            jsonData[i]['round'] -= 7;
-          else if (jsonData[i]['round'] == 13 || jsonData[i]['round'] == 20 || jsonData[i]['round'] == 27) // 커뮤니티 프로젝트
-            jsonData[i]['round'] = 'Contribution';
-          else if (jsonData[i]['round'] == 14 || jsonData[i]['round'] == 21 || jsonData[i]['round'] == 28) // 커뮤니티 프로젝트
-            jsonData[i]['round'] = 'Satisfaction';
-          else if (jsonData[i]['round'] > 14 && jsonData[i]['round'] < 20)
-            jsonData[i]['round'] -= 11;
-          else if (jsonData[i]['round'] > 21 && jsonData[i]['round'] < 27)
-            jsonData[i]['round'] -= 13;
-          
-          writeData.push(jsonData[i]);
-        }
-        var now_time = new Date();
-        var csv_file_name = "game_record_" + now_time.getDate() + "_" + now_time.getHours() + "_" + now_time.getMinutes() + ".csv";
-        const ws = fs.createWriteStream(csv_file_name);
-        fastcsv
-          .write(writeData, { headers: true })
-          .on("finish", function() {
-            console.log("Write to game_record.csv successfully!");
-            res.send('');
-          })
-          .pipe(ws);
-      }
     });
   });
   
