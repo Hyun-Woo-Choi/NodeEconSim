@@ -1,0 +1,20 @@
+1) 트랜잭션
+
+- for loop 돌면서 업데이트 쿼리 보내는 부분이 걱정
+- https://www.happykoo.net/@happykoo/posts/135
+- 트랜잭션이 없어도 될지 검토 (첫번째 아이템만 업데이트하고 이후에서 에러 나도 게임 진행에 문제가 없는지?)
+
+2) mySQL ver2
+
+- ver2로 갈아타면 트랜잭션 걸기 편함.
+- https://tlqckd0.tistory.com/53
+
+3) 버전업 관련 업데이트
+
+- fe를 나눈다면 socket, ejs 등은 다 바뀔 것 같음 (아래 순서 추천)
+
+1. Node js 버전 업 및 라이브러리 버전 업
+2. Transaction은 아직 걸지 말고 myslq2를 써서 aysnc await 적용하기
+3. 보기 편해진 sql 쿼리들을 살펴보고 쿼리 합치거나 줄일 수 있나 보기
+
+
