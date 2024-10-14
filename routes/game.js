@@ -430,7 +430,6 @@ module.exports = function(io) {
                                                                                                     }
                                                                                                 });
                                                                                             });
-
                                                                                             // 동일한 province에서 아직 완료되지 않은 방이 있는지 확인
                                                                                             db.query('SELECT COUNT(*) AS incomplete FROM game_info WHERE province_id=? AND room_submit = 0', [province_id], function(err6, result6) {
                                                                                                 if (err6) {

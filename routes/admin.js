@@ -18,7 +18,6 @@ module.exports = function(io) {
         res.cookie('lang', 'ko');
         var_cookie_lang = 'ko';
       }
-      
       var var_admin_status = req.cookies.admin_status;
       res.clearCookie('admin_status');
       if (var_admin_status === undefined)
