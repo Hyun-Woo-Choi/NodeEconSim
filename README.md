@@ -30,3 +30,11 @@
 - If not changed, the default admin credentials in [add_admin.js] are:
   - **ID**: [`admin`]
   - **Password**: [`***REMOVED***`]
+
+6. Created RDS in AWS
+
+- Just created RDS in AWS with mysql. more information to connect
+  - **Server Host** :***REMOVED***
+  - \*\*Database:
+  - \*\*Username: admin
+  - \*\*Password: ***REMOVED***
