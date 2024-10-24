@@ -29,7 +29,9 @@
 
 - If not changed, the default admin credentials in [add_admin.js] are:
   - **ID**: [`admin`]
-  - **Password**: [`dia1357`]
+  - **Password**: [`dia1357`] 
+  password changed 
+  
 
 6. **Connectinf AWS RDS**:
 - you should connect to AWS RDS with password and key, if local you should use connect to local database
