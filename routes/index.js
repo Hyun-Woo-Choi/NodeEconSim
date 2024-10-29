@@ -44,50 +44,39 @@ module.exports = function(io) {
   });
 
   // 로그인
-  router.post('/login_process', function(req, res, next) {
-    var input_id = req.body.input_id;
-    var input_password = req.body.input_password;
-    db.query('SELECT * FROM users WHERE id=?', [input_id], function(err, info) {
-      if (err) {
-        console.log(err, input_id);
-        res.redirect('/');
-      }
-      else {
-        if (info.length > 0) {
-          bcrypt.compare(input_password, info[0].password, function(err2, result) {
-            if (err2) { // 에러
-              console.log(err2, input_id);
-              res.redirect('/');
-            }
-            else {
-              if (result) {
-                if (input_id in io.user_2_socket_id) { // 중복 로그인 방지
-                  io.message(io.user_2_socket_id[input_id], 'duplicate_login', req.clientIp);
-                  res.cookie('login_status', res.__('duplicate_login'));
-                  res.redirect('/');
-                }
-                else { // 성공
-                  req.session.user_id = input_id;
-                  if (input_id === 'admin')
-                    res.redirect('/admin');
-                  else
-                    res.redirect('/users');
-                }
-              }
-              else { // 아이디 혹은 비밀번호 불일치
-                res.cookie('login_status', res.__('login_status'));
-                res.redirect('/');
-              }
-            }
-          });
-        }
-        else {
+  router.post('/login_process', async (req, res) => {
+    const input_id = req.body.input_id;
+    const input_password = req.body.input_password;
+  
+    try {
+      const [info] = await db.query('SELECT * FROM users WHERE id = ?', [input_id]);
+  
+      if (info.length > 0) {
+        const isPasswordCorrect = await bcrypt.compare(input_password, info[0].password);
+  
+        if (isPasswordCorrect) {
+          if (input_id in io.user_2_socket_id) { // Prevent duplicate login
+            io.message(io.user_2_socket_id[input_id], 'duplicate_login', req.clientIp);
+            res.cookie('login_status', res.__('duplicate_login'));
+            return res.redirect('/');
+          } else { // Successful login
+            req.session.user_id = input_id;
+            return res.redirect(input_id === 'admin' ? '/admin' : '/users');
+          }
+        } else { // Incorrect ID or password
           res.cookie('login_status', res.__('login_status'));
-          res.redirect('/');
+          return res.redirect('/');
         }
+      } else { // User not found
+        res.cookie('login_status', res.__('login_status'));
+        return res.redirect('/');
       }
-    });
+    } catch (err) {
+      console.log('Error during login:', err);
+      return res.redirect('/');
+    }
   });
+
 
   // 중복 로그인 - session 삭제
   router.get('/session_destroy_as_duplicate', function(req, res, next) {
