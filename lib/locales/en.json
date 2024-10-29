@@ -12,6 +12,7 @@
 	"game_input_status": "The selected production exceeds your budget.",
 	"game_disaster_status": "You have exceeded the available electricity!",
 	"game_int_status": "Please enter integers only",
+	"game_to_much_input" : "Please enter smaller number",
 	"game_input_contribution_status": "The selected contribution exceeds the available budget",
 	"predicted_input_disaster": "Please enter a number between 0 and 15.",
 	"start": "Start",

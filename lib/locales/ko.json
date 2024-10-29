@@ -12,6 +12,7 @@
 	"game_input_status": "선택한 생산량이 귀하의 예산을 초과합니다. (20 단위 이하의 전기만 구입 가능합니다.)",
 	"game_disaster_status": "사용 가능한 전력을 초과합니다!",
 	"game_int_status": "정수만 입력해주세요",
+	"game_to_much_input" : "너무 높은 개수를 입력하셨습니다",
 	"game_input_contribution_status": "선택한 기부금이 주어진 예산을 초과합니다",
 	"predicted_input_disaster": "0~6 사이의 숫자만 적어주세요.",
 	"start": "시작",
