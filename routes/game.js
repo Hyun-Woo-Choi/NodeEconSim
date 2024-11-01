@@ -138,6 +138,7 @@ module.exports = function(io) {
     let budget_limit = 0;
   
     const previous_game_record = user_game_record.filter(record => {
+      if (record.round >= now_round) return false;
       if (now_round >= 7 && record.round < 7) return false;
       return ![6, 12, 13, 19, 20, 26, 27].includes(record.round);
     });
@@ -277,16 +278,31 @@ router.post('/submit_round', [
     // Validate input based on specific round limits
     const is_disaster_occurred = game_params.isdisasteroccured;
     const total_energy = Number(game_params.total_energy);
-
-    if ((round === 1 && input_one > 20) ||
-        ([13, 20, 27].includes(round) && input_one > 7) ||
-        ([6, 12, 19, 26].includes(round) && input_one > budget) ||
-        ([6, 12, 19, 26].includes(round) && input_two > 10) ||
-        (![1, 6, 12, 13, 19, 20, 26, 27].includes(round) && is_disaster_occurred && round > 13 && input_one > Math.floor(total_energy / 4)) ||
-        (![1, 6, 12, 13, 19, 20, 26, 27].includes(round) && !is_disaster_occurred && input_one > 20)) {
+  
+  if (![6, 12, 13, 19, 20, 26, 27].includes(round) && is_disaster_occurred && round > 13 && input_one > Math.floor(total_energy)) { 
+      // Restrict input_one to total_energy if a disaster occurred on rounds other than specified disaster rounds
       res.cookie('game_input_status', res.__('game_input_status'));
       return res.redirect('/game');
-    }
+  } 
+  
+  else if (![6, 12, 13, 19, 20, 26, 27].includes(round) && input_one > 0 && budget < 0) { 
+      // Restrict input_one to budget on non-disaster rounds if budget is greater than 0
+      res.cookie('game_input_status', res.__('game_input_status'));
+      return res.redirect('/game');
+  } 
+  
+  else if ([6, 12, 19, 26].includes(round) && input_one > budget && budget > 0) { 
+      // Restrict input_one to budget on specific contribution rounds if budget is greater than 0
+      res.cookie('game_input_status', res.__('game_input_contribution_status'));
+      return res.redirect('/game');
+  } 
+  
+  else if ([6, 12, 19, 26].includes(round) && input_two > 20) { 
+      // Restrict input_two to a maximum of 20 for specific disaster prediction rounds
+      res.cookie('game_input_status', res.__('predicted_input_disaster'));
+      return res.redirect('/game');
+  } 
+  
 
     // Check for duplicate submission
     const [result] = await db.query('SELECT * FROM game_record WHERE round=? AND id=? AND room_id=?', [round, user_id, room_number]);

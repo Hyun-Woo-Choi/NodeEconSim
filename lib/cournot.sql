@@ -61,7 +61,7 @@ CREATE TABLE `disaster_parameter` (
 
 -- default parameter of game
 INSERT INTO disaster_parameter (init_w, adjusted_w, price_var, init_budget, disaster_probability, isdisasteroccured, first_disaster, second_disaster, third_disaster, forth_disaster, fifth_disaster, total_energy, disaster_number)
-            VALUES (10, 10, 40, 5000, 20, 0, 0, 0, 0, 0, 0, 0, 0);
+            VALUES (10, 30, 40, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- all game record
 CREATE TABLE `game_record` (

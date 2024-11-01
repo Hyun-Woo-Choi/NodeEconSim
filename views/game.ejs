@@ -78,6 +78,8 @@
               <h3 class="user-info"> • ID: <%= now_user_id %> • Round: <%= now_round - 8 %></h3>
             <% } else if (now_round >= 21 && now_round < 26) { %>
               <h3 class="user-info"> • ID: <%= now_user_id %> • Round: <%= now_round - 10 %></h3>
+            <% } else if (now_round >= 26 && now_round < 33) { %>
+                <h3 class="user-info"> • ID: <%= now_user_id %> • Round: <%= now_round - 12 %></h3>
             <% } else { %>
               <h3 class="user-info"> • ID: <%= now_user_id %> • <%= __('game_user_gameEnd') %></h3>
             <% } %>
@@ -161,23 +163,33 @@
               <% } %>
             </div>
 
-            
+    
           </div>
           <!-- Right Column -->
           <div class="col-md-6">
-            <% if (is_wait === 0 && now_round < 33) { %>
+            <% if (is_wait === 0 && now_round < 33) { %> 
               <div class="row mx-auto justify-content-center">
                 <% if (user_status === 4) { %>
                   <p class="alert alert-info text-monospace my-3 mx-2 explanation-text" id="game_explain">
                     <%= __('game_stop_explanation') %>
                   </p>
                 <% } else { %>
-                  <% if (game_type == 1 && (now_round == 6 || now_round == 12 || now_round == 19 || now_round == 26)) { %>
+                  <% if ((now_round == 6 || now_round == 12 || now_round == 19 || now_round == 26) && budget < 0) { %> 
+                    <div class="alert alert-info my-3 mx-2" id="game_explain" style="text-align: justify; background-color: #ffffff; border: 1px solid #1a097a; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                      <strong class="d-block text-center" style="font-size: 20px; color: #1a097a; font-weight: bold;">
+                        <%- __('game_contribution_explanation_zero').split("<br>")[0] %>
+                      </strong>
+                      <br>
+                      <span style="color: #333; font-size: 16px; line-height: 1.6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                        <%- __('game_contribution_explanation_zero').split("<br>").slice(1).join("<br>") %>
+                      </span>
+                    </div>
+                  <% } else if (game_type == 1 && (now_round == 6 || now_round == 12 || now_round == 19 || now_round == 26)) { %>
                     <div class="alert alert-info my-3 mx-2" id="game_explain" style="text-align: justify; background-color: #ffffff; border: 1px solid #1a097a; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
                       <strong class="d-block text-center" style="font-size: 20px; color: #1a097a; font-weight: bold;">
                         <%- __('game_contribution_explanation').split("<br>")[0] %>
                       </strong>
-                      <br>
+                      <br> 
                       <span style="color: #333; font-size: 16px; line-height: 1.6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
                         <%- __('game_contribution_explanation').split("<br>").slice(1).join("<br>") %>
                       </span>
@@ -202,6 +214,16 @@
                         <%- __('game_contribution_explanation_3').split("<br>").slice(1).join("<br>") %>
                       </span>
                     </div>
+                    <% } else if (![13, 20, 27].includes(now_round) && budget < -100) { %>
+                      <div class="alert alert-info my-3 mx-2" id="game_explain" style="text-align: center; background-color: #f8f9ff; border: 1px solid #1a097a; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                        <strong style="font-size: 20px; color: #1a097a; font-weight: bold;">
+                          <%- __('budget_constraint').split("<br>")[0] %>
+                        </strong>
+                        <br>
+                        <span style="color: #333; font-size: 16px; line-height: 1.6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                          <%- __('budget_constraint').split("<br>").slice(1).join("<br>") %>
+                        </span>
+                      </div>
                   <% } else if (now_round == 13 || now_round == 20 || now_round == 27) { %>
                     <div class="alert alert-info my-3 mx-2" id="game_explain" style="text-align: justify; background-color: #ffffff; border: 1px solid #1a097a; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
                       <strong class="d-block text-center" style="font-size: 20px; color: #1a097a; font-weight: bold;">
@@ -238,7 +260,7 @@
 
               <!-- input 빈칸 -->
               <form method="post" action="/game/submit_round">
-                <% if (![6, 12, 13, 19, 20, 26, 27].includes(now_round) && isdisaster_occured == 1) { %>
+                <% if (![6, 12, 13, 19, 20, 26, 27].includes(now_round) && isdisaster_occured == 1 && budget > 0) { %>
                   <div class="form-group row">
                     <label for="input_one" class="col-2 col-form-label ml-auto"><%= __('input_production') %></label>
                     <div class="col-6">
@@ -246,6 +268,17 @@
                     </div>
                   </div>
                   <input type="hidden" name="input_two" value="0">
+                  <% } else if (![6, 12, 13, 19, 20, 26, 27].includes(now_round) && isdisaster_occured == 1 && budget <-100) { %>
+                    <input type="hidden" name="input_one" value="0">
+                    <input type="hidden" name="input_two" value="0">
+                  <% } else if ((now_round == 6 || now_round == 12 || now_round == 19 || now_round == 26) && budget <-100) { %>
+                    <input type="hidden" name="input_one" value="0">
+                    <div class="form-group row justify-content-end">
+                        <label for="input_two" class="col-4 col-form-label text-right"><%= __('predicted_disaster') %></label>
+                        <div class="col-6">
+                            <input type="text" class="form-control" id="input_two" placeholder="0" name="input_two" required="true">
+                        </div>
+                    </div>  
                   <% } else if (now_round == 6 || now_round == 12 || now_round == 19 || now_round == 26) { %>
                     <div class="form-group row justify-content-end">
                         <label for="input_one" class="col-4 col-form-label text-right"><%= __('energy_store_contribution_input') %></label>

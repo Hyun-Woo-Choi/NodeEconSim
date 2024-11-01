@@ -228,7 +228,10 @@ router.post('/assign_province', async function(req, res, next) {
     // Loop through each room and assign province_id
     for (let index = 0; index < game_list.length; index++) {
       const room_id = game_list[index].room_id;
+
+      // Update province_id in both game_info and game_parameter tables
       await db.query('UPDATE game_info SET province_id = ? WHERE room_id = ?', [province_id, room_id]);
+      await db.query('UPDATE game_parameter SET province_id = ? WHERE room_id = ?', [province_id, room_id]);
 
       // Increment province_id every `province_n` rooms
       if ((index + 1) % province_n === 0) {
@@ -236,12 +239,13 @@ router.post('/assign_province', async function(req, res, next) {
       }
     }
 
-    res.send('Provinces assigned successfully');
+    res.send('Provinces assigned successfully to both game_info and game_parameter tables');
   } catch (error) {
     console.log('admin province error', error);
     res.status(500).send('Error assigning provinces');
   }
 });
+
 
 router.post('/make_all_room', async function(req, res, next) {
   try {
