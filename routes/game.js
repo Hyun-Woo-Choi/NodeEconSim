@@ -148,14 +148,15 @@ module.exports = function(io) {
       game_record_html += `<div class="table-responsive"><table class="table table-bordered table-sm"><thead class="thead-dark"><tr>`;
       headers.forEach(header => game_record_html += `<th style="text-align: center;">${header}</th>`);
       game_record_html += `</tr></thead><tbody>`;
-  
+
       previous_game_record.forEach(record => {
-        game_record_html += `<tr><td style="text-align: center;">${adjustRound(record.round)}</td>`;
-        Object.keys(record).forEach(key => {
-          if (['id', 'start_time', 'round'].includes(key)) return;
-          game_record_html += `<td style="text-align: center;">${record[key]}</td>`;
-        });
-        game_record_html += `</tr>`;
+          game_record_html += `<tr><td style="text-align: center;">${adjustRound(record.round)}</td>`;
+          Object.keys(record).forEach(key => {
+              if (['id', 'start_time', 'round'].includes(key)) return;
+              const value = record[key] === null || record[key] === undefined ? '' : record[key]; // null 값을 빈 문자열로 대체
+              game_record_html += `<td style="text-align: center;">${value}</td>`;
+          });
+          game_record_html += `</tr>`;
       });
   
       game_record_html += `</tbody></table></div>`;
