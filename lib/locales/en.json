@@ -12,7 +12,7 @@
 	"game_input_status": "The selected production exceeds your budget.",
 	"game_disaster_status": "You have exceeded the available electricity!",
 	"game_int_status": "Please enter integers only",
-	"game_to_much_input" : "Please enter smaller number",
+	"game_to_much_input": "Please enter smaller number",
 	"game_input_contribution_status": "The selected contribution exceeds the available budget",
 	"predicted_input_disaster": "Please enter a number between 0 and 20.",
 	"start": "Start",
@@ -20,9 +20,9 @@
 	"stop": "Stop",
 	"game_explanation": "<strong>&lt;Electricity Purchasing Game&gt;</strong> <br> ◯ Please decide how much electricity you would like to purchase for this round. The market price and the resulting profit will be determined based on the total amount of electricity decided by the 4 participants, including yourself.",
 	"game_submit_wait": " ◯ Once all neighboring groups have completed the production game, the Group Status will turn green. <strong> The next round will proceed only after all users and neighboring groups have completed the production game.</strong>",
-	"game_submit_wait_within_community":" ◯ Once all members of your group have submitted, the next round will automatically begin. Please wait a moment.", 
+	"game_submit_wait_within_community": " ◯ Once all members of your group have submitted, the next round will automatically begin. Please wait a moment.",
 	"game_contribution_explanation": "<strong>&lt;Community EES Game&gt;</strong><br>◯ Please indicate your contributions to a community EES project AND, if you were to play an electricity purchase game for 20 rounds, how many of those rounds would have a natural disaster? </u>",
-    "game_contribution_explanation_2": "<strong>&lt;Community EES Game&gt;</strong><br>◯ Please indicate your opinion on a desired number of EES systems (<u>n</u>) AND, if you were to play an electricity purchase game for 20 rounds, how many of those rounds would have a natural disaster? </u>",
+	"game_contribution_explanation_2": "<strong>&lt;Community EES Game&gt;</strong><br>◯ Please indicate your opinion on a desired number of EES systems (<u>n</u>) AND, if you were to play an electricity purchase game for 20 rounds, how many of those rounds would have a natural disaster? </u>",
 	"game_contribution_explanation_3": "<strong>&lt;Community EES Game&gt;</strong><br>◯  The construction of the energy storage facility will be decided based on the <u>total contributions</u> from group participants. In the event of a disaster during the next five rounds, only the electricity stored in the energy storage facility will be available.  <u>If a disaster occurs, dividends proportional to your contribution will be added to your profits!</u>  (Additionally, 10 more production games are expected. Please enter the <u>predicted number of disasters</u>.)",
 	"game_stop_explanation": "Temporarily paused",
 	"other_submit": "Submit",
@@ -88,5 +88,11 @@
 	"input_production": "Electricity",
 	"duplicate_entry": "duplicate_entry",
 	"game_total_energy_list": "Status of Contributions from Other Groups: ",
-	"budget_constraint": "Your current budget is less than -100, so you cannot purchase electricity."
+	"budget_constraint": "Your current budget is less than -100, so you cannot purchase electricity.",
+	"force_execute": "force_execute",
+	"Force Execute": "Force Execute",
+	"force execute": "force execute",
+	"Force execute": "Force execute",
+	"game_total_energy_average": "game_total_energy_average",
+	"Maximum_amount_of_Stored_Electricity": "Maximum_amount_of_Stored_Electricity"
 }

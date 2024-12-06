@@ -427,6 +427,7 @@
         });
       });
 
+
       $(document).on("click", ".delete_user_room_class", function () {
         if ('<%= cookie_lang %>' == 'ko')
           var yes_or_no = confirm('방에서 삭제?');
@@ -446,6 +447,7 @@
         }
       });
 
+      
       $(document).on("click", ".delete_room_class", function () {
         if ('<%= cookie_lang %>' == 'ko')
           var yes_or_no = confirm('방 삭제?');
@@ -465,6 +467,7 @@
         }
       });
 
+
       $('#user_2_room').click(function () {
         var target_room_number = $("#room_number :selected").val();
         var target_selected_user = $('#selected_user').text();
@@ -483,6 +486,7 @@
 
         $('#add_user_room').modal('hide');
       });
+
 
       $(document).on("click", ".start_room_class", function () {
         if ('<%= cookie_lang %>' == 'ko')
@@ -537,7 +541,67 @@
         }
       });
 
+// 이벤트 위임 방식으로 버튼 클릭 이벤트 처리
+$(document).on('click', '.force_cal_round_class', function() {
+  if ('<%= cookie_lang %>' == 'ko') {
+    var yes_or_no = confirm('강제로 계산을 진행하시겠습니까?');
+  } else {
+    var yes_or_no = confirm('Do you want to force execute the calculation?');
+  }
+
+  if (yes_or_no) {
+    const button = $(this); // 클릭된 버튼
+    const roomId = button.data('id'); // Room ID 추출
+    const round = parseInt($(`#Round${roomId}`).text().trim(), 10); // 현재 라운드 번호를 정수로 변환하여 추출
+
+    if (isNaN(round)) {
+      alert('Invalid round value detected. Please check the round information.');
+      return;
+    }
+
+    button.prop('disabled', true).text('Executing...'); // 버튼 상태 변경
+
+    // 서버로 계산 요청 전송
+    $.ajax({
+      type: 'POST',
+      url: '/admin/execute_calculation', // 계산 실행 요청 URL
+      data: JSON.stringify({
+        room_id: roomId, // 방 번호
+        round: round // 현재 라운드 번호
+      }),
+      contentType: 'application/json', // JSON 형식으로 서버에 데이터 전송
+      success: function(response) {
+        if (response.success) {
+          // 성공 처리
+          button.prop('disabled', true).text('Calculation Successful');
+          $(`#status${roomId}`).text('Calculation Completed');
+          alert('Calculation executed successfully for room ' + roomId);
+        } else {
+          // 서버에서 success가 false일 때
+          button.prop('disabled', false).text('Force Calculate');
+          $(`#status${roomId}`).text('Calculation Failed');
+          alert('Error: ' + (response.error || 'Unknown error occurred.'));
+        }
+      },
+      error: function(xhr) {
+        // AJAX 요청 실패 시
+        button.prop('disabled', false).text('Force Calculate');
+        $(`#status${roomId}`).text('Calculation Failed');
+        
+        if (xhr.responseJSON && xhr.responseJSON.error) {
+          // 서버에서 전송된 에러 메시지 출력
+          alert('Error: ' + xhr.responseJSON.error);
+        } else {
+          // 일반적인 네트워크 오류
+          alert('A network error occurred. Please try again.');
+        }
+      }
     });
+  }
+});
+
+    });
+
   </script>
 </body>
 

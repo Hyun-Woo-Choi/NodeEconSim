@@ -5,6 +5,7 @@ const fs = require("fs");
 
 var db = require('../lib/mysql_');
 var game_control = require('../lib/game_control');
+const { isNull } = require('lodash');
 
 module.exports = function(io) {
   var router = express.Router();
@@ -140,6 +141,7 @@ module.exports = function(io) {
 });
 
 
+
 router.post('/make_one_room', async function(req, res, next) {
   try {
     const type_val = req.body.type_val;
@@ -189,6 +191,7 @@ router.post('/make_one_room', async function(req, res, next) {
     const wrap_room_id = "wrap_room" + next_room_id;
     const start_room_id = 'start' + next_room_id;
     const stop_room_id = 'stop' + next_room_id;
+    const force_execute = 'force_execute' + next_room_id;
     const return_html = `
       <div class="col-md-3 mb-3" id=${wrap_room_id}>
         <div class="card text-center">
@@ -201,9 +204,11 @@ router.post('/make_one_room', async function(req, res, next) {
           <div class="card-footer text-muted">
             <button class="start_room_class btn btn-primary text-white" data-id=${next_room_id} id=${start_room_id}>${res.__('start')}</button>
             <button class="stop_room_class btn btn-primary text-white" data-id=${next_room_id} id=${stop_room_id} disabled>${res.__('stop')}</button>
+            <button class="force_cal_round_class btn btn-warning text-white" data-id=${next_room_id} id=${force_execute}>${res.__('Force Execute')}</button>
           </div>
         </div>
       </div>`;
+    
 
     res.send(return_html);
 
@@ -212,6 +217,9 @@ router.post('/make_one_room', async function(req, res, next) {
     res.status(500).send('An error occurred while creating the room.');
   }
 });
+
+
+
 
 router.post('/assign_province', async function(req, res, next) {
   try {
@@ -329,89 +337,92 @@ router.post('/make_all_room', async function(req, res, next) {
   }
 });
 
-  // 새로고침 하면 방을 불러옴
-  router.post('/load_game_info', async (req, res) => {
-    let var_room_html = "";
-  
-    try {
-      const [game_list] = await db.query('SELECT room_id, province_id, game_type, room_status FROM game_info');
-      const [user_list] = await db.query('SELECT id, room, status FROM users');
-      const [game_round] = await db.query("SELECT room_id, COUNT(room_id) AS round FROM game_record WHERE id='admin' GROUP BY room_id");
-  
-      const room_round_cnt = {};
-      for (let i = 0; i < game_round.length; ++i) {
-        room_round_cnt[game_round[i].room_id] = game_round[i].round;
-      }
-  
-      for (let i = 0; i < game_list.length; ++i) { // Room card generation
-        const now_game_info = game_list[i];
-        const now_room_status = now_game_info.room_status;
-        const wrap_room_id = `wrap_room${now_game_info.room_id}`;
-        const round_room_id = `Round${now_game_info.room_id}`;
-        const room_province_id = `Province${now_game_info.province_id}`;
-        const now_round = room_round_cnt[now_game_info.room_id] || 1;
-  
-        var_room_html += `
-          <div class="col-md-3 mb-3" id=${wrap_room_id}>
-            <div class="card text-center">
-              <div class="card-header"> Province: ${now_game_info.province_id}, Room: ${now_game_info.room_id}, Type: ${now_game_info.game_type}, Round: <span id=${round_room_id}>${now_round}</span> 
-                <button type="button" class="delete_room_class close ml-auto" data-id=${now_game_info.room_id}> <span>x</span> </button> 
-              </div>
-              <div class="card-body" id=${now_game_info.room_id}>`;
-  
-        for (let j = 0; j < user_list.length; ++j) { // User status display
-          const now_user_info = user_list[j];
-          const user_status_id = `status${now_user_info.id}`;
-          const temp = now_user_info.status;
-          const now_user_status = ['wait', 'ready', 'start', 'stop', 'end'][temp - 1] || '';
-  
-          if (now_game_info.room_id === now_user_info.room) {
-            const selected_user_val_id = `room${now_user_info.id}`;
-            var_room_html += `
-              <div class="row border-bottom" id=${selected_user_val_id}>
-                <b>${now_user_info.id}</b><b class="ml-auto" id=${user_status_id}>${now_user_status}</b>
-                <button type="button" class="delete_user_room_class close pl-3" data-id=${now_user_info.id}> <span>-</span> </button>
-              </div>`;
-          }
-        }
-  
-        const start_room_id = `start${now_game_info.room_id}`;
-        const stop_room_id = `stop${now_game_info.room_id}`;
-        var_room_html += `
-            </div>
-            <div class="card-footer text-muted">`;
-  
-        if (now_room_status === 2) { // Stopped
-          var_room_html += `
-              <button class="start_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${start_room_id}>${res.__('restart')}</button>
-              <button class="stop_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${stop_room_id} disabled>${res.__('stop')}</button>`;
-        } else if (now_room_status === 1) { // In progress
-          var_room_html += `
-              <button class="start_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${start_room_id} disabled>${res.__('restart')}</button>
-              <button class="stop_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${stop_room_id}>${res.__('stop')}</button>`;
-        } else if (now_room_status === 3) { // Ended
-          var_room_html += `
-              <button class="start_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${start_room_id} disabled>${res.__('restart')}</button>
-              <button class="stop_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${stop_room_id} disabled>${res.__('stop')}</button>`;
-        } else if (now_room_status === 0) { // Not started
-          var_room_html += `
-              <button class="start_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${start_room_id}>${res.__('start')}</button>
-              <button class="stop_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${stop_room_id} disabled>${res.__('stop')}</button>`;
-        }
-  
-        var_room_html += `
-            </div>
-          </div>
-        </div>`;
-      }
-  
-      res.send(var_room_html);
-    } catch (error) {
-      console.log('Error loading game info:', error);
-      res.send('fail');
+
+router.post('/load_game_info', async (req, res) => {
+  let var_room_html = "";
+
+  try {
+    const [game_list] = await db.query('SELECT room_id, province_id, game_type, room_status FROM game_info');
+    const [user_list] = await db.query('SELECT id, room, status FROM users');
+    const [game_round] = await db.query("SELECT room_id, COUNT(room_id) AS round FROM game_record WHERE id='admin' GROUP BY room_id");
+
+    const room_round_cnt = {};
+    for (let i = 0; i < game_round.length; ++i) {
+      room_round_cnt[game_round[i].room_id] = game_round[i].round;
     }
-  });
-  
+
+    for (let i = 0; i < game_list.length; ++i) { // Room card generation
+      const now_game_info = game_list[i];
+      const now_room_status = now_game_info.room_status;
+      const wrap_room_id = `wrap_room${now_game_info.room_id}`;
+      const round_room_id = `Round${now_game_info.room_id}`;
+      const room_province_id = `Province${now_game_info.province_id}`;
+      const now_round = room_round_cnt[now_game_info.room_id] || 1;
+
+      var_room_html += `
+        <div class="col-md-3 mb-3" id=${wrap_room_id}>
+          <div class="card text-center">
+            <div class="card-header"> Province: ${now_game_info.province_id}, Room: ${now_game_info.room_id}, Type: ${now_game_info.game_type}, Round: <span id=${round_room_id}>${now_round}</span> 
+              <button type="button" class="delete_room_class close ml-auto" data-id=${now_game_info.room_id}> <span>x</span> </button> 
+            </div>
+            <div class="card-body" id=${now_game_info.room_id}>`;
+
+      for (let j = 0; j < user_list.length; ++j) { // User status display
+        const now_user_info = user_list[j];
+        const user_status_id = `status${now_user_info.id}`;
+        const temp = now_user_info.status;
+        const now_user_status = ['wait', 'ready', 'start', 'stop', 'end'][temp - 1] || '';
+
+        if (now_game_info.room_id === now_user_info.room) {
+          const selected_user_val_id = `room${now_user_info.id}`;
+          var_room_html += `
+            <div class="row border-bottom" id=${selected_user_val_id}>
+              <b>${now_user_info.id}</b><b class="ml-auto" id=${user_status_id}>${now_user_status}</b>
+              <button type="button" class="delete_user_room_class close pl-3" data-id=${now_user_info.id}> <span>-</span> </button>
+            </div>`;
+        }
+      }
+
+      const start_room_id = `start${now_game_info.room_id}`;
+      const stop_room_id = `stop${now_game_info.room_id}`;
+      const force_execute = `force_execute${now_game_info.room_id}`
+
+      var_room_html += `
+          </div>
+          <div class="card-footer text-muted">`;
+
+      if (now_room_status === 2) { // Stopped
+        var_room_html += `
+            <button class="start_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${start_room_id}>${res.__('restart')}</button>
+            <button class="stop_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${stop_room_id} disabled>${res.__('stop')}</button>`;
+      } else if (now_room_status === 1) { // In progress
+        var_room_html += `
+            <button class="start_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${start_room_id} disabled>${res.__('restart')}</button>
+            <button class="stop_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${stop_room_id}>${res.__('stop')}</button>
+            <button class="force_cal_round_class btn btn-warning text-white" data-id=${now_game_info.room_id} id=${force_execute}>${res.__('Force Execute')}</button>`;
+      } else if (now_room_status === 3) { // Ended
+        var_room_html += `
+            <button class="start_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${start_room_id} disabled>${res.__('restart')}</button>
+            <button class="stop_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${stop_room_id} disabled>${res.__('stop')}</button>`;
+      } else if (now_room_status === 0) { // Not started
+        var_room_html += `
+            <button class="start_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${start_room_id}>${res.__('start')}</button>
+            <button class="stop_room_class btn btn-primary" data-id=${now_game_info.room_id} id=${stop_room_id} disabled>${res.__('stop')}</button>`;
+      }
+
+      var_room_html += `
+          </div>
+        </div>
+      </div>`;
+    }
+
+    res.send(var_room_html);
+  } catch (error) {
+    console.log('Error loading game info:', error);
+    res.send('fail');  
+  }
+});
+
   // 오른쪽 사용자 불러옴
 router.post('/load_user_info', async (req, res) => {
   let var_user_html = "";
@@ -461,6 +472,7 @@ router.post('/load_room_number', async function(req, res, next) {
   }
 });
 
+
 router.post('/user_2_room', async function(req, res, next) {
   try {
     const room_number_val = req.body.room_number_val;
@@ -502,6 +514,7 @@ router.post('/user_2_room', async function(req, res, next) {
     res.status(500).send('An error occurred while adding the user to the room');
   }
 });
+
 
 
 router.post('/out_user_room', async function(req, res, next) {
@@ -561,6 +574,8 @@ function generateUserHtml(userId) {
     </div>`;
 }
 
+
+
 router.post('/delete_room', async function(req, res, next) {
   try {
     const selected_room_val = req.body.selected_room_val;
@@ -613,6 +628,8 @@ router.post('/delete_room', async function(req, res, next) {
   }
 });
 
+
+
 router.post('/start_room', async function(req, res, next) {
   try {
     const selected_room_val = req.body.selected_room_val;
@@ -661,6 +678,8 @@ router.post('/start_room', async function(req, res, next) {
   }
 });
 
+
+
   // 게임을 멈춤
   router.post('/stop_room', async function(req, res, next) {
     try {
@@ -690,6 +709,8 @@ router.post('/start_room', async function(req, res, next) {
       res.status(500).send('An error occurred while stopping the game');
     }
   });
+
+
 
   // 재시작
   router.post('/restart_room', async function(req, res, next) {
@@ -733,6 +754,68 @@ router.post('/start_room', async function(req, res, next) {
       res.status(500).send('An error occurred while restarting the room');
     }
   });
+
+
+  router.post('/execute_calculation', async (req, res) => {
+    try {
+      const { room_id, round } = req.body;
+  
+      // Log the incoming request to confirm data structure
+      console.log('Incoming request body:', req.body);
+  
+      // 입력 데이터 검증
+      if (!room_id || !round) {
+        console.error('Invalid input data:', { room_id, round });
+        return res.status(400).json({ success: false, error: 'Invalid input data. room_id and round are required.' });
+      }
+  
+      console.log(`Fetching game record for room ${room_id}, round ${round}`);
+  
+      try {
+        // 요청된 room_id와 round에 해당하는 game_record 데이터 가져오기
+        const [gameRecord] = await db.query(
+          'SELECT input_one FROM game_record WHERE room_id = ? AND round = ?', 
+          [room_id, round]
+        );
+  
+        if (!gameRecord.length) {
+          throw new Error('No game records found for the specified room and round.');
+        }
+  
+        if (gameRecord === null || gameRecord === undefined) {
+          throw new Error(`Invalid input_one value: ${gameRecord}. It must not be Null or Undefined.`);
+        }
+  
+        console.log(`Input_one value for room ${room_id}, round ${round}: ${gameRecord}`);
+  
+        // 관리자 라운드 설정
+        const admin_round = round + 1;
+  
+        // cal_round 함수 호출
+        await game_control.cal_round(room_id, round, admin_round, [], io);
+  
+        // 클라이언트에 성공 응답
+        return res.json({
+          success: true,
+          message: `cal_round executed successfully for room ${room_id}, round ${round}, admin round ${admin_round}.`,
+        });
+  
+      } catch (error) {
+        console.error(`Error executing cal_round for room ${room_id}, round ${round}:`, error.message);
+  
+        // 클라이언트에 실패 응답
+        return res.status(500).json({
+          success: false,
+          error: error.message || 'Internal server error',
+        });
+      }
+    } catch (outerError) {
+      console.error('Unexpected error in /execute_calculation route:', outerError);
+      return res.status(500).json({ success: false, error: 'Unexpected server error.' });
+    }
+  });
+  
+  
 
 // 게임 기록 csv 다운로드
 router.post('/download_record', async function(req, res, next) {
