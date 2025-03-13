@@ -7,7 +7,7 @@ var logger = require('morgan');
 var session = require('express-session')
 var FileStore = require('session-file-store')(session)
 const requestIp = require('request-ip');
-var favicon = require('serve-favicon')
+// var favicon = require('serve-favicon')
 
 var i18nSetting = require('./lib/i18n_');
 var socket_ = require('./lib/socket_')
@@ -36,7 +36,7 @@ app.use(session({
   store:new FileStore({retries: 2})
 }))
 app.use(requestIp.mw())
-app.use(favicon(path.join(__dirname, 'public/images', 'favicon.ico')))
+// app.use(favicon(path.join(__dirname, 'public/images', 'favicon.ico')))
 
 app.use(i18nSetting.init);
 app.use('/', indexRouter);
