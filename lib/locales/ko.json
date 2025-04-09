@@ -7,8 +7,8 @@
 	"make_id_fail": "동일한 아이디가 존재합니다",
 	"set_parameter_success": "파라미터 수정 완료",
 	"set_parameter_fail": "파라미터가 숫자가 아닙니다",
-	"not_in_room_description": "그룹 배정을 <br>기다려주세요",
-	"in_room_description": "준비 버튼을 누르신 후 <br>기다려주세요",
+	"not_in_room_description": "그룹 배정을 기다리는 중입니다. <br> 게임은 4명씩 한 그룹으로 구성됩니다.",
+	"in_room_description": "그룹 배정이 완료되었습니다. <br> 아래 버튼을 누르면 게임이 시작됩니다.",
 	"game_input_status": "선택한 전기 구입량이 예산을 초과합니다.",
 	"game_disaster_status": "사용 가능한 전기를 초과합니다!",
 	"game_int_status": "정수만 입력해주세요",
@@ -50,10 +50,10 @@
 	"game_user_value_project2": ", 기여금 총액)",
 	"game_user_largest_budget": "재난 발생 시 사용 가능한 전기량 (1인당, w) : 전체 기여금 / 150 ",
 	"game_user_disaster_dividends": "배당금 = 15 × (총 기여금 / 37.5) × (나의 기여금 / 전체 기여금) ",
-	"game_user_parameter": "전기 가격 (Token) : 같은 그룹 내 전기 구입량의 총합",
-	"game_user_makeCost": " 이익 (Token) : (40 x 나의 구입량) - (전기 가격 x 나의 구입량)",
+	"game_user_parameter": "<strong>전기 가격</strong>: Q (Total Q)",
+	"game_user_makeCost": " <strong>이익</strong> : (40 x q) - (전기 가격 x q)",
 	"game_user_makeCost2": " 전기 총 구입량",
-	"game_user_makeCost3": "에너지 집약도 (=E/Q) : 1",
+	"game_user_makeCost3": "<strong>에너지 집약도 (=E/Q) </strong> : 1",
 	"game_user_unit": "토큰 (Token)",
 	"game_user_Num": " x 생산 총량",
 	"game_user_communtiy": "재난 시 전기 가격(Token) = ",
@@ -92,5 +92,6 @@
 	"Maximum_amount_of_Stored_Electricity": "다른 그룹의 가용 에너지 : ",
 	"budget_constraint": "현재 예산이 -100보다 작아, 활동이 제약됩니다. Submit 버튼을 누르면, 자동으로 0이 입력됩니다.",
 	"game_contribution_explanation_zero": "<strong>&lt;에너지 저장 시설 기여금 결정&gt;</strong><br>◯ 에너지 저장 시설의 건설은 그룹 참가자들의 <u>총 기여금</u>에 따라 결정됩니다. 그러나 현재 예산이 0 토큰보다 작아 기여금은 자동으로 0으로 설정됩니다. (앞으로 20번의 생산 게임이 예정되어 있습니다. <u>예상 재난 발생 횟수</u>를 입력해 주세요.)",
-	"Force Execute": "Force Execute"
+	"Force Execute": "Force Execute",
+	"group_waiting_message": "group_waiting_message"
 }

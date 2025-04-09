@@ -1,188 +1,177 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>
-    <%= __('title') %>
-  </title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="stylesheets/theme.css">
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= __('title') %></title>
+
+  <!-- Styles & Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+
   <style>
-    html,
-    body {
+    html, body {
       height: 100%;
       margin: 0;
       padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    .navbar-brand img {
+      height: 48px;
+      margin-right: 10px;
+    }
+
+    .navbar span {
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .status-box {
+      background: #ffffff;
+      border: 1px solid #17a2b8;
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .spinner-border {
+      width: 2rem;
+      height: 2rem;
+      margin-top: 1.5rem;
+      animation: spinner-border 1.5s linear infinite !important;
+    }
+
+    .status-text {
+      font-size: 1.5rem;
+      font-weight: 400;
+    }
+
+    footer {
+      background-color: #f1f1f1;
+      padding: 1rem 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .btn-info {
+      background-color: #117b8d;
+      border-color: #117b8d;
+      font-weight: bold;
+    }
+
+    .btn-info:hover {
+      background-color: #0c6a7c;
+      border-color: #0c6a7c;
     }
   </style>
 </head>
 
-<body style="display: flex; flex-direction: column;">
-  <div style="flex-grow: 1">
-    <!-- ko / en -->
-    <nav class="navbar navbar-expand-md navbar-light border-bottom border-gray bg-light">
-      <div class="container px-3 d-flex justify-content-start align-items-center">
-        <a class="navbar-brand mr-3" href="/">
-          <img class="img-fluid" src="images/title_disaster2.png" style="width:80px;"
-            class="d-inline-block align-text-top">
-          <span style="font-weight: bold; font-size: 24px;">Disaster Economics Lab</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-          <ul class="navbar-nav">
-            <li class="nav-item mx-1">
-              <% if (cookie_lang==='ko' ) { %>
-                <a class="nav-link nav_pointer" style="font-weight: bold;"><u>한글</u></a>
-                <% } else { %>
-                  <a class="nav-link nav_pointer" href="/ko">한글</a>
-                  <% } %>
-            </li>
-            <li class="nav-item mx-1">
-              <% if (cookie_lang==='en' ) { %>
-                <a class="nav-link nav_pointer" style="font-weight: bold;"><u>ENG</u></a>
-                <% } else { %>
-                  <a class="nav-link nav_pointer" href="/en">ENG</a>
-                  <% } %>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+<body class="d-flex flex-column">
 
-
-    <div class="pt-3">
-      <div class="container">
-        <div class="row">
-          <div class="col-3"></div>
-          <div class="col-6">
-            <h2 class="text-center">
-              <%= __('title') %>
-            </h2>
-            <hr>
-          </div>
-          <div class="col-3"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="pt-3">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-md-6 text-left">
-            <a class="text-muted signout_cursor" id="signout" style="font-size: 20px; cursor: pointer;">
-              <%= __('admin_logout') %>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 준비 버튼 박스 -->
-    <div class="pb-5 text-center">
-      <div class="container">
-        <div class="row">
-          <div class="mx-auto col-md-6 bg-white p-5 border border-info rounded shadow-lg">
-            <div class="row">
-              <div class="col-md-12">
-                <h1 class="display-9 text-dark font-weight-normal mb-1"><%- description %></h1>
-              </div>
-            </div>
-            <% if (user_status != 0) { %>
-            <div class="row">
-              <div class="col-md-2"></div>
-              <div class="col-md-8">
-                <% if (user_status == 1) { %>
-                  <button type="button" class="btn btn-info btn-block mt-5" id="status_button"><%= __('user_ready') %></button>
-                <% } else if (user_status == 2) { %>
-                  <button type="button" class="btn btn-info btn-block mt-5 active" id="status_button"><%= __('user_wait') %></button>
-                <% } %>
-              </div>
-              <div class="col-md-2"></div>
-            </div>
-            <% } %>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <footer class="pt-2 border-top border-gray bg-light">
+  <!-- ✅ Navbar -->
+  <nav class="navbar navbar-expand-md navbar-light border-bottom bg-light">
     <div class="container">
-      <div class="row">
-        <div class="col-md-12 text-center">
-          <p>© 2024 Disaster Economics Lab. All rights reserved</p>
+      <a class="navbar-brand d-flex align-items-center" href="/">
+        <img src="images/title_disaster2.png" alt="Logo" />
+        <span>Disaster Economics Lab</span>
+      </a>
+
+      <!-- Toggle button for mobile -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Collapsible navbar -->
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item mx-2">
+            <a class="nav-link <%= cookie_lang === 'ko' ? 'font-weight-bold active' : '' %>" href="/ko">한글</a>
+          </li>
+          <li class="nav-item mx-2">
+            <a class="nav-link <%= cookie_lang === 'en' ? 'font-weight-bold active' : '' %>" href="/en">ENG</a>
+          </li>
+          <li class="nav-item mx-2">
+            <a class="nav-link text-danger" href="#" id="signout"><%= __('admin_logout') %></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ✅ Main -->
+  <main class="flex-grow-1 d-flex justify-content-center" style="padding-top: 8vh;">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6 status-box">
+          <div class="status-text"><%- description %></div>
+
+          <% if (user_status == 1) { %>
+            <button type="button" class="btn btn-info mt-4" id="status_button"><%= __('user_ready') %></button>
+          <% } else if (user_status == 0 || user_status == 2) { %>
+            <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
+          <% } %>
         </div>
       </div>
     </div>
+  </main>
+
+  <!-- ✅ Footer -->
+  <footer class="text-center border-top bg-light mt-auto">
+    <p class="mb-0">© 2024 Disaster Economics Lab. All rights reserved.</p>
   </footer>
 
+  <!-- ✅ Scripts -->
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="javascripts/users_socket.js"></script>
+  <script>
+    $(function () {
+      users_socket.connect_user('<%= now_user_id %>');
 
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
-      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-      crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-      crossorigin="anonymous"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript" src="javascripts/users_socket.js"></script>
-    <script>
-      $(function () {
-        users_socket.connect_user('<%= now_user_id %>');
+      $('#status_button').click(function () {
+        $(this).prop('disabled', true);
+        setTimeout(function () {
+          $('#status_button').prop('disabled', false);
+        }, 1000);
 
-        $('#status_button').click(function () {
-          $(this).prop('disabled', true);
-          setTimeout(function () {
-            $('#status_button').prop('disabled', false);
-          }, 1000); // 1 second delay
+        var now_status_var = $(this).hasClass('active') ? 1 : 2;
 
-          var now_status_var;
-          if ($(this).hasClass('active'))
-            now_status_var = 1;
-          else
-            now_status_var = 2;
-
-          $.ajax({
-            type: 'POST',
-            url: '/users/change_status',
-            data: { now_status: now_status_var },
-            success: function (result) {
-              if (now_status_var === 1) {
-                $('#status_button').removeClass('active');
-                if ('<%= cookie_lang %>' == 'ko')
-                  $('#status_button').html('준비');
-                else
-                  $('#status_button').html('ready');
-              }
-              else {
-                $('#status_button').addClass('active');
-                if ('<%= cookie_lang %>' == 'ko')
-                  $('#status_button').html('대기');
-                else
-                  $('#status_button').html('wait');
-              }
+        $.ajax({
+          type: 'POST',
+          url: '/users/change_status',
+          data: { now_status: now_status_var },
+          success: function (result) {
+            if (now_status_var === 1) {
+              $('#status_button').removeClass('active').html('<%= cookie_lang === "ko" ? "준비" : "ready" %>');
+            } else {
+              $('#status_button').remove(); // 버튼 제거
+              $('.status-box').append('<div class="spinner-border text-info" role="status" aria-hidden="true"></div>');
             }
-          });
+          }
         });
-
-        $('#signout').click(function () {
-          if ('<%= cookie_lang %>' == 'ko')
-            var yes_or_no = confirm('로그아웃 하시겠습니까?');
-          else
-            var yes_or_no = confirm('Are you sure you want to log out?');
-          if (yes_or_no)
-            location.replace('/users/signout');
-        });
-
       });
-    </script>
+
+      $('#signout').click(function () {
+        const msg = '<%= cookie_lang %>' === 'ko'
+          ? '로그아웃 하시겠습니까?'
+          : 'Are you sure you want to log out?';
+        if (confirm(msg)) {
+          location.replace('/users/signout');
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

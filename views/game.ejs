@@ -1,56 +1,159 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= __('title') %></title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="stylesheets/theme.css">
-  <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-  </style>
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= __('title') %></title>
+  
+    <!-- Styles & Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+      }
+  
+      .navbar-brand img {
+        height: 48px;
+        margin-right: 10px;
+      }
+  
+      .navbar span {
+        font-size: 22px;
+        font-weight: 600;
+      }
+  
+      .nav-link:focus,
+      .nav-link:active {
+        transform: none !important;
+        font-size: inherit !important;
+      }
+  
+      .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
+      }
+  
+      .input-group-text {
+        background-color: #e9ecef;
+        border: none;
+      }
 
-<body style="display: flex; flex-direction: column;">
-  <div style="flex-grow: 1">
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-md navbar-light border-bottom border-gray bg-light">
-      <div class="container px-3 d-flex justify-content-start align-items-center">
-        <a class="navbar-brand mr-3" href="/">
-          <img class="img-fluid" src="images/title_disaster2.png" style="width:80px;" class="d-inline-block align-text-top">
-          <span style="font-weight: bold; font-size: 24px;">Disaster Economics Lab</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-          <ul class="navbar-nav">
-            <li class="nav-item mx-1">
-              <% if (cookie_lang === 'ko') { %>
-                <a class="nav-link nav_pointer" style="font-weight: bold;"><u>한글</u></a>
-              <% } else { %>
-                <a class="nav-link nav_pointer" href="/ko">한글</a>
-              <% } %>
-            </li>
-            <li class="nav-item mx-1">
-              <% if (cookie_lang === 'en') { %>
-                <a class="nav-link nav_pointer" style="font-weight: bold;"><u>ENG</u></a>
-              <% } else { %>
-                <a class="nav-link nav_pointer" href="/en">ENG</a>
-              <% } %>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+      footer {
+        background-color: #f1f1f1;
+        padding: 1rem 0;
+        font-size: 14px;
+        color: #666;
+      }
+
+      .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 0.45rem 1.2rem;
+        transition: background-color 0.2s ease-in-out;
+        box-shadow: none;
+      }
+
+      .btn-primary:hover {
+        background-color: #0056d2;
+      }
+
+      .btn-primary:active {
+        background-color: #004cb3;
+        transform: translateY(0);
+        box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .info-card {
+        background-color: #ffffff;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      .info-card {
+        min-height: 250px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .info-card h5 i {
+        vertical-align: middle;
+        margin-right: 6px;
+      }
+
+      .list-group-item {
+        font-size: 16px;
+        padding: 12px 16px;
+        border: none;
+        border-bottom: 1px solid #eee;
+      }
+
+      .list-group-item:last-child {
+        border-bottom: none;
+      }
+
+      .energy-img {
+        max-width: 370px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      .energy-img-lg {
+        max-width: 510px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      }
+
+    </style>
+  </head>
+  
+  <body class="d-flex flex-column">
+ <!-- Navbar -->
+ <nav class="navbar navbar-expand-md navbar-light border-bottom bg-light">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="/">
+      <img src="images/title_disaster2.png" alt="Logo" />
+      <span>Disaster Economics Lab</span>
+    </a>
+
+    <!-- 모바일용 토글 버튼 -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- 언어 & 로그아웃 메뉴 -->
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item mx-2">
+          <a class="nav-link <%= cookie_lang === 'ko' ? 'font-weight-bold active' : '' %>" href="/ko">한글</a>
+        </li>
+        <li class="nav-item mx-2">
+          <a class="nav-link <%= cookie_lang === 'en' ? 'font-weight-bold active' : '' %>" href="/en">ENG</a>
+        </li>
+        <li class="nav-item mx-2">
+          <a class="nav-link text-danger" href="#" id="signout"><%= __('admin_logout') %></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
     <!-- Main Content -->
     <div class="py-5">
@@ -58,112 +161,215 @@
         <div class="row">
           <!-- Left Column -->
           <div class="col-md-6">
-            <a class="text-muted signout_cursor" id="signout" style="font-size: 17px; cursor: pointer;"><%= __('admin_logout') %> </a>
-            
-            <% if (now_round < 6) { %>
-              <h3 class="user-info"> • ID: <%= now_user_id %> • (Practice) Round: <%= now_round %></h3>
-            <% } else if (now_round == 6) { %>
-              <h3 class="user-info">ID: <%= now_user_id %> • (Practice) <%= __('game_user_contribution') %> 
-                <span class="group-status-container"> • Other Groups Status: <span class="group-status"><%- room_submit_html %></span></span>
-              </h3>
-            <% } else if (now_round == 12 || now_round == 19 || now_round == 26) { %>
-              <h3 class="user-info">ID: <%= now_user_id %> • <%= __('game_user_contribution') %> 
-                <span class="group-status-container"> • Other Groups Status: <span class="group-status"><%- room_submit_html %></span></span>
-              </h3>
-            <% } else if (now_round == 13 || now_round == 20 || now_round == 27) { %>
-              <h3 class="user-info"> • ID: <%= now_user_id %> • <%= __('game_sense_of_community') %></h3>
-            <% } else if (now_round >= 7 && now_round < 14) { %>
-              <h3 class="user-info"> • ID: <%= now_user_id %> • Round: <%= now_round - 6 %></h3>
-            <% } else if (now_round >= 14 && now_round < 21) { %>
-              <h3 class="user-info"> • ID: <%= now_user_id %> • Round: <%= now_round - 8 %></h3>
-            <% } else if (now_round >= 21 && now_round < 26) { %>
-              <h3 class="user-info"> • ID: <%= now_user_id %> • Round: <%= now_round - 10 %></h3>
-            <% } else if (now_round >= 26 && now_round < 33) { %>
-                <h3 class="user-info"> • ID: <%= now_user_id %> • Round: <%= now_round - 12 %></h3>
-            <% } else { %>
-              <h3 class="user-info"> • ID: <%= now_user_id %> • <%= __('game_user_gameEnd') %></h3>
-            <% } %>
-            
-            <style>
-              .user-info {
-                font-size: 20px; /* 글자 크기 */
-                font-weight: normal;
-                line-height: 1.2; /* 줄 간격 */
-                margin-bottom: 10px; /* 아래 간격 */
-              }
-              .group-status-container {
-                font-size: 20px; /* 글자 크기 */
-              }
-              .group-status {
-                font-size: 20px; /* 글자 크기 */
-                color: #555;
-              }
-              hr {
-                margin-top: 5px; /* 위쪽 간격 */
-                margin-bottom: 10px; /* 아래쪽 간격 */
-              }
-            </style>
-            <hr>
-            <!-- 게임 왼쪽 정보 -->
-            <div class="container border border-info rounded">
-              <% if ((now_round == 6 || now_round == 12 || now_round == 19 || now_round == 26) && game_type == 3) { %>
-                <div class="list-group list-group-flush">
-                  <a class="list-group-item" style="color: #ff0000;"><strong>
-                    <%= __('game_disaster_probability') %> <%= game_parameters['disaster_probability'] %>
-                  </strong></a>
-                  <a class="list-group-item"><%= __('game_user_budget') %> <%= budget %></a>
-                  <a class="list-group-item"><%= __('game_users_budget') %> <%= budgets.join(", ") %></a>
-                  <a class="list-group-item"><%= __('game_user_largest_budget') %></a>
-                  <a class="list-group-item"><%= __('game_user_disaster_dividends') %></a>
-                  <div class="d-flex justify-content-center my-3">
-                    <img class="img-fluid" src="images/energy1.jpg" alt="Energy Storage Facility"
-                      style="max-width: 370px; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                  </div>
+              <% if (now_round < 6) { %>
+                <div class="user-info">
+                  <strong>ID:</strong> <%= now_user_id %> • <span class="round-tag">(Practice) Round: <%= now_round %></span>
                 </div>
-              <% } else if ((now_round == 6 || now_round == 12 || now_round == 19 || now_round == 26)) { %>
-                <div class="list-group list-group-flush">
-                  <a class="list-group-item" style="color: #ff0000;"><strong>
-                    <%= __('game_disaster_probability') %> <%= game_parameters['disaster_probability'] %>%
-                  </strong></a>
-                  <a class="list-group-item"><%= __('game_user_budget') %> <%= budget %></a>
-                  <a class="list-group-item"><%= __('game_users_budget') %> <%= budgets.join(", ") %></a>
-                  <div class="d-flex justify-content-center my-3">
-                    <img class="img-fluid" src="images/energy1.jpg" alt="Energy Storage Facility"
-                      style="max-width: 370px; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                  </div>
+              <% } else if (now_round == 6) { %>
+                <div class="user-info">
+                  <strong>ID:</strong> <%= now_user_id %> • <span class="round-tag">(Practice) <%= __('game_user_contribution') %></span>
+                  <div class="group-status-container">• <span class="label">Other Groups Status:</span> <span class="group-status"><%- room_submit_html %></span></div>
                 </div>
-              <% } else if (now_round > 32) { %>
-                <div class="list-group list-group-flush">
-                  <a class="list-group-item"><%= __('game_user_budget') %> <%= budget %></a>
-                  <a class="list-group-item"><%= __('game_users_budget') %> <%= budgets.join(", ") %></a>
+              <% } else if (now_round == 12 || now_round == 19 || now_round == 26) { %>
+                <div class="user-info">
+                  <strong>ID:</strong> <%= now_user_id %> • <%= __('game_user_contribution') %>
+                  <div class="group-status-container">• <span class="label">Other Groups Status:</span> <span class="group-status"><%- room_submit_html %></span></div>
                 </div>
               <% } else if (now_round == 13 || now_round == 20 || now_round == 27) { %>
-                <div class="list-group list-group-flush">
-                  <a class="list-group-item"><%= __('community_round_stat') %><%= inputs.join(", ") %></a> 
-                  <a class="list-group-item"><%= __('disaster_electrocity') %> <%= usable_electrocity %></a> 
-                  <a class="list-group-item"><%= __('game_total_energy_average') %> <%= total_energy_div_4_list.join(', ') %></a>
-                  <a class="list-group-item"><%= __('Maximum_amount_of_Stored_Electricity') %> <%= total_energy_div_140_list.join(', ') %></a>
+                <div class="user-info">
+                  <strong>ID:</strong> <%= now_user_id %> • <%= __('game_sense_of_community') %>
                 </div>
-              <% } else if ((((13 < now_round < 19) && isdisaster_occured == 1) || (20 < now_round < 27) && isdisaster_occured == 1) || (27 < now_round < 33) && isdisaster_occured == 1) { %>
-                <div class="list-group list-group-flush text-center">
-                  <a class="list-group-item" style="color: #ff0000;"><strong>
-                    <%= __('disaster_occured_electrocity') %> <%= usable_electrocity %> Unit
-                  </strong></a>
-                  <div class="d-flex justify-content-center my-3">
-                    <img class="img-fluid" src="images/disaster4.jpg" alt="Energy Storage Facility"
-                      style="max-width: 510px; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                  </div>
+              <% } else if (now_round >= 7 && now_round < 14) { %>
+                <div class="user-info">
+                  <strong>ID:</strong> <%= now_user_id %> • Round: <%= now_round - 6 %>
+                </div>
+              <% } else if (now_round >= 14 && now_round < 21) { %>
+                <div class="user-info">
+                  <strong>ID:</strong> <%= now_user_id %> • Round: <%= now_round - 8 %>
+                </div>
+              <% } else if (now_round >= 21 && now_round < 26) { %>
+                <div class="user-info">
+                  <strong>ID:</strong> <%= now_user_id %> • Round: <%= now_round - 10 %>
+                </div>
+              <% } else if (now_round >= 26 && now_round < 33) { %>
+                <div class="user-info">
+                  <strong>ID:</strong> <%= now_user_id %> • Round: <%= now_round - 12 %>
                 </div>
               <% } else { %>
-                <div class="list-group list-group-flush">
-                  <a class="list-group-item"><%= __('game_user_parameter') %></a>
-                  <a class="list-group-item"><%= __('game_user_makeCost') %></a>
-                  <a class="list-group-item"><%= __('game_user_makeCost3') %></a>
+                <div class="user-info">
+                  <strong>ID:</strong> <%= now_user_id %> • <%= __('game_user_gameEnd') %>
                 </div>
               <% } %>
-            </div>
 
-    
+              <style>
+                .user-info {
+                  font-size: 18px;
+                  font-weight: 500;
+                  color: #212529;
+                  margin-bottom: 10px;
+                  line-height: 1.4;
+                }
+
+                .round-tag {
+                  font-weight: 400;
+                  color: #007bff;
+                }
+
+                .group-status-container {
+                  font-size: 16px;
+                  margin-top: 4px;
+                  color: #555;
+                }
+
+                .group-status-container .label {
+                  font-weight: 500;
+                  color: #6c757d;
+                }
+
+                .group-status {
+                  font-weight: 600;
+                  color: #333;
+                }
+
+                hr {
+                  margin-top: 10px;
+                  margin-bottom: 12px;
+                  border-color: #dee2e6;
+                }
+
+                .signout_cursor {
+                  font-weight: 500;
+                  color: #6c757d;
+                }
+              </style>
+            <hr>
+
+            <div class="container bg-white shadow rounded-4 p-4 mb-4 border border-light-subtle"
+            style="max-width: 600px; font-family: 'Segoe UI', 'Noto Sans KR', sans-serif; font-size: 1.05rem; line-height: 1.6; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+       
+         <% if ((now_round == 6 || now_round == 12 || now_round == 19 || now_round == 26) && game_type == 3) { %>
+           <!-- Disaster Round Info -->
+           <div class="pb-2 mb-3 border-bottom d-flex align-items-center">
+             <i class="bi bi-exclamation-triangle-fill text-dark me-3 fs-5"></i>
+             <h5 class="fw-bold text-dark mb-0">Disaster Round Info</h5>
+           </div>
+       
+           <div class="d-flex justify-content-between py-2 border-bottom">
+             <span class="text-dark"><%= __('game_disaster_probability') %></span>
+             <span class="fw-bold text-danger"><%= game_parameters['disaster_probability'] %>%</span>
+           </div>
+           <div class="d-flex justify-content-between py-2 border-bottom">
+             <span class="text-dark"><%= __('game_user_budget') %></span>
+             <span><%= budget %></span>
+           </div>
+           <div class="d-flex justify-content-between py-2 border-bottom">
+             <span class="text-dark"><%= __('game_users_budget') %></span>
+             <span><%= budgets.join(", ") %></span>
+           </div>
+       
+           <div class="pt-2 text-dark">
+             <div><i class="bi bi-cash-coin me-1"></i> <%= __('game_user_largest_budget') %></div>
+             <div><i class="bi bi-coin me-1"></i> <%= __('game_user_disaster_dividends') %></div>
+           </div>
+       
+           <div class="text-center mt-3">
+             <img src="images/energy1.jpg" alt="Energy Storage Facility"
+                  class="img-fluid rounded shadow-sm" style="max-height: 200px;">
+           </div>
+       
+         <% } else if ((now_round == 6 || now_round == 12 || now_round == 19 || now_round == 26)) { %>
+           <!-- Group Round Info -->
+           <div class="pb-2 mb-3 border-bottom d-flex align-items-center">
+             <i class="bi bi-people-fill text-dark me-3 fs-5">&nbsp;</i>
+             <h5 class="fw-bold text-dark mb-0">Group Round Info</h5>
+           </div>
+       
+           <div class="d-flex justify-content-between py-2 border-bottom">
+             <span class="text-dark"><%= __('game_disaster_probability') %></span>
+             <span class="fw-bold text-danger"><%= game_parameters['disaster_probability'] %>%</span>
+           </div>
+           <div class="d-flex justify-content-between py-2 border-bottom">
+             <span class="text-dark"><%= __('game_user_budget') %></span>
+             <span><%= budget %></span>
+           </div>
+           <div class="d-flex justify-content-between py-2">
+             <span class="text-dark"><%= __('game_users_budget') %></span>
+             <span><%= budgets.join(", ") %></span>
+           </div>
+       
+           <div class="text-center mt-3">
+             <img src="images/energy1.jpg" alt="Energy Storage Facility"
+                  class="img-fluid rounded shadow-sm" style="max-height: 200px;">
+           </div>
+       
+         <% } else if (now_round > 32) { %>
+           <!-- Post Game Info -->
+           <div class="pb-2 mb-3 border-bottom d-flex align-items-center">
+             <i class="bi bi-graph-up-arrow text-dark me-3 fs-5"></i>
+             <h5 class="fw-bold text-dark mb-0">Post-Game Info</h5>
+           </div>
+       
+           <div class="d-flex justify-content-between py-2 border-bottom">
+             <span class="text-dark"><%= __('game_user_budget') %></span>
+             <span><%= budget %></span>
+           </div>
+           <div class="d-flex justify-content-between py-2">
+             <span class="text-dark"><%= __('game_users_budget') %></span>
+             <span><%= budgets.join(", ") %></span>
+           </div>
+       
+         <% } else if (now_round == 13 || now_round == 20 || now_round == 27) { %>
+           <!-- Community Stats -->
+           <div class="pb-2 mb-3 border-bottom d-flex align-items-center">
+            <i class="bi bi-bar-chart-line text-dark me-3 fs-5"></i>&nbsp;
+             <h5 class="fw-bold text-dark mb-0">Community Stats</h5>
+           </div>
+       
+           <div class="py-2 border-bottom text-dark">
+             <%= __('community_round_stat') %> <strong><%= inputs.join(", ") %></strong>
+           </div>
+           <div class="py-2 border-bottom text-dark">
+             <%= __('disaster_electrocity') %> <strong><%= usable_electrocity %></strong>
+           </div>
+           <div class="py-2 border-bottom text-dark">
+             <%= __('game_total_energy_average') %> <strong><%= total_energy_div_4_list.join(', ') %></strong>
+           </div>
+           <div class="py-2 text-dark">
+             <%= __('Maximum_amount_of_Stored_Electricity') %><strong><%= total_energy_div_140_list.join(', ') %></strong>
+           </div>
+       
+         <% } else if (((13 < now_round && now_round < 19) && isdisaster_occured == 1) ||
+                       ((20 < now_round && now_round < 27) && isdisaster_occured == 1) ||
+                       ((27 < now_round && now_round < 33) && isdisaster_occured == 1)) { %>
+           <!-- Disaster Occurred -->
+           <div class="alert alert-danger text-center fw-bold fs-6 mb-3 p-2">
+             ⚠ <%= __('disaster_occured_electrocity') %> <%= usable_electrocity %> Unit
+           </div>
+           <div class="text-center">
+             <img src="images/disaster4.jpg" alt="Disaster Occurred"
+                  class="img-fluid rounded shadow-sm" style="max-height: 220px;">
+           </div>
+       
+         <% } else { %>
+           <!-- Default Game Parameters -->
+           <div class="pb-2 mb-3 border-bottom d-flex align-items-center">
+            <i class="bi bi-box text-dark me-3 fs-5"></i>&nbsp;
+             <h5 class="fw-bold text-dark mb-0"> Game Parameters</h5>
+           </div>
+       
+           <div class="py-2 border-bottom text-dark">
+             <%- __('game_user_parameter') %>
+           </div>
+           <div class="py-2 border-bottom text-dark">
+             <%- __('game_user_makeCost') %>
+           </div>
+           <div class="py-2 text-dark">
+             <%- __('game_user_makeCost3') %>
+           </div>
+         <% } %>
+       </div>
+       
+       
           </div>
           <!-- Right Column -->
           <div class="col-md-6">
@@ -323,6 +529,10 @@
                       <% } else { %>
                         <span class="mr-3"><a id="time_limit" style="display: none;"></a></span>
                         <button type="submit" class="btn btn-primary" id="game_submit" disabled>Submit</button>
+                        <!-- 스피너 추가 -->
+                        <div class="spinner-border text-primary ml-2" role="status" style="width: 1.5rem; height: 1.5rem;">
+                          <span class="sr-only">Loading...</span>
+                        </div>
                       <% } %>
                     </div>
                   </div>
@@ -332,13 +542,32 @@
                 </div>
               </form>
               <% } else if (is_wait === 1) { %>
-                <div class="waiting-section my-3 mx-2">
+                <style>
+                  .slow-spinner {
+                    animation: spinner-border 1.5s linear infinite !important; /* 기본보다 느리게 */
+                    margin-top: 1rem; /* 더 아래로 */
+                  }
+                
+                  @keyframes spinner-border {
+                    100% {
+                      transform: rotate(360deg);
+                    }
+                  }
+                </style>
+                
+                <div class="waiting-section my-3 mx-2 text-center">
                   <% if (user_status === 4 ) { %>
                     <p class="text-monospace" id="game_explain"><%= __('game_stop_explanation') %></p>
                   <% } else if (now_round == 6 || now_round == 12 || now_round == 19 || now_round == 26) { %>
                     <p class="text-monospace" id="game_explain"><%- __('game_submit_wait') %></p>
+                    <div class="spinner-border text-secondary slow-spinner" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
                   <% } else { %>
                     <p class="text-monospace" id="game_explain"><%- __('game_submit_wait_within_community') %></p>
+                    <div class="spinner-border text-secondary slow-spinner" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
                   <% } %>
                 </div>
               <% } else if (now_round >= 33) { %>
